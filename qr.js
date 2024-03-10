@@ -1,4 +1,3 @@
-
 const fs = require("fs-extra");
 const express = require("express");
 const app = express();
@@ -42,8 +41,9 @@ app.use("/", async (req, res) => {
       let ovl = OvlWASocket({ 
         printQRInTerminal: false,
         logger: pino({ level: "silent" }), 
-        browser: ['
-        auth: state 
+        browser: [ "Ubuntu", "Chrome", "20.0.04" ],
+        auth: state.creds,
+                    keys: makeCacheableSignalKeyStore(state.keys, pino({level: "silent"}).child({level: "silent"})),
       });
 
       ovl.ev.on("connection.update", async (s) => {
