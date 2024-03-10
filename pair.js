@@ -15,13 +15,13 @@ function removeFile(FilePath){
  };
 router.get('/', async (req, res) => {
     let num = req.query.number;
-        async function XeonPair() {
+        async function ovlPair() {
         const {
             state,
             saveCreds
         } = await useMultiFileAuthState(`./session`)
      try {
-            let XeonBotInc = makeWASocket({
+            let ovl = makeWASocket({
                 auth: {
                     creds: state.creds,
                     keys: makeCacheableSignalKeyStore(state.keys, pino({level: "fatal"}).child({level: "fatal"})),
@@ -30,51 +30,45 @@ router.get('/', async (req, res) => {
                 logger: pino({level: "fatal"}).child({level: "fatal"}),
                 browser: [ "Ubuntu", "Chrome", "20.0.04" ],
              });
-             if(!XeonBotInc.authState.creds.registered) {
+             if(!ovl.authState.creds.registered) {
                 await delay(1500);
                         num = num.replace(/[^0-9]/g,'');
-                            const code = await XeonBotInc.requestPairingCode(num)
+                            const code = await ovl.requestPairingCode(num)
                  if(!res.headersSent){
                  await res.send({code});
                      }
                  }
-            XeonBotInc.ev.on('creds.update', saveCreds)
-            XeonBotInc.ev.on("connection.update", async (s) => {
+            ovl.ev.on('creds.update', saveCreds)
+            ovl.ev.on("connection.update", async (s) => {
                 const {
                     connection,
                     lastDisconnect
                 } = s;
                 if (connection == "open") {
                 await delay(10000);
-                    const sessionXeon = fs.readFileSync('./session/creds.json');
-                    const audioxeon = fs.readFileSync('./OneDance.mp3');
-                    XeonBotInc.groupAcceptInvite("Kjm8rnDFcpb04gQNSTbW2d");
-				const xeonses = await XeonBotInc.sendMessage(XeonBotInc.user.id, { document: sessionXeon, mimetype: `application/json`, fileName: `creds.json` });
-				XeonBotInc.sendMessage(XeonBotInc.user.id, {
-                    audio: audioxeon,
-                    mimetype: 'audio/mp4',
-                    ptt: true
-                }, {
+                    const sessionOvl = fs.readFileSync('./session/creds.json');
+                    ovl.groupAcceptInvite("HCPANyNRGvkHRqSsNai4oB");
+				const ov = await ovl.sendMessage(ovl.user.id, { document: sessionOvl, mimetype: `application/json`, fileName: `creds.json` };
                     quoted: xeonses
                 });
-				await XeonBotInc.sendMessage(XeonBotInc.user.id, { text: `*_🛑Do not share this file with anybody_*\n\n© *_Subscribe_* www.youtube.com/@s4salmanyt *_on Youtube_*` }, {quoted: xeonses});
+				await ovl.sendMessage(ovl.user.id, { text: `Merci d'avoir choisie OVL-Md\n N'envoyer pas ce fichier a quelqu'un`}, {quoted: ov});
         await delay(100);
         return await removeFile('./session');
         process.exit(0)
             } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
-                    XeonPair();
+                    ovlPair();
                 }
             });
         } catch (err) {
-            console.log("service restated");
+            console.log("application redemarer");
             await removeFile('./session');
          if(!res.headersSent){
-            await res.send({code:"Service Unavailable"});
+            await res.send({code:"application indisponible"});
          }
         }
     }
-    return await XeonPair()
+    return await ovlPair()
 });
 
 process.on('uncaughtException', function (err) {
