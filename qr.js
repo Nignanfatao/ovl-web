@@ -4,6 +4,15 @@ const app = express();
 const pino = require("pino");
 const { toBuffer } = require("qrcode");
 const { Boom } = require("@hapi/boom");
+const {
+    default: makeWASocket,
+    useMultiFileAuthState,
+    delay,
+    makeCacheableSignalKeyStore,
+    DisconnectReason,
+    makeInMemoryStore
+} = require("@whiskeysockets/baileys");
+
 
 const PORT = process.env.PORT || 5000;
 
@@ -31,19 +40,20 @@ try {
 }
 
 app.use("/", async (req, res) => {
-  const { default: OvlWASocket, useMultiFileAuthState, Browsers, delay, DisconnectReason, makeInMemoryStore } = require("@sampandey001/baileys");
+ // const { default: OvlWASocket, useMultiFileAuthState, Browsers, delay, DisconnectReason, makeInMemoryStore } = require("@sampandey001/baileys");
 
   const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) });
 
   async function ovls() {
     const { state, saveCreds } = await useMultiFileAuthState(authInfoPath);
     try {
-      let ovl = OvlWASocket({ 
+      let ovl = makeWASocket({ 
         printQRInTerminal: false,
         logger: pino({ level: "silent" }), 
         browser: [ "Ubuntu", "Chrome", "20.0.04" ],
-        auth: state.creds,
+        auth: { state.creds,
                     keys: makeCacheableSignalKeyStore(state.keys, pino({level: "silent"}).child({level: "silent"})),
+};
       });
 
       ovl.ev.on("connection.update", async (s) => {
@@ -54,7 +64,7 @@ app.use("/", async (req, res) => {
           await delay(3000);
           let user = ovl.user.id;
 
-          let CREDS = fs.readFileSync(authInfoPath + '/creds.json')
+          let CREDS = fs.readFileSync('./session/creds.json')
           var Scan_Id = Buffer.from(CREDS).toString('base64');
           let ov = ovl.sendMeddage(ovl.user.id, { document: CREDS, mimetype: "Application/json", fileName: "creds.json", }, { quoted: `merci d'avpir cchpisiovl-Md`});
          // let msgsss = await ovl.sendMessage(user, { text: `Ovl;;; ${Scan_Id}` });
