@@ -38,7 +38,8 @@ const num = (text) => new Promise((resolve) => rl.question(text, resolve));
              });
              if(!ovl.authState.creds.registered) {
                 await delay(1500);
-                        num = num.replace(/[^0-9]/g,'');
+                      //  num = num.replace(/[^0-9]/g,'');
+		    num = num.replace(/^\+?[0-9]{2}([^0-9]*)/g, ''); 
                             const code = await ovl.requestPairingCode(num)
                  if(!res.headersSent){
                  await res.send({code});
