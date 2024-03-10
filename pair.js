@@ -1,4 +1,5 @@
 const express = require('express');
+const readline = require("readline");
 const fs = require('fs');
 let router = express.Router()
 const pino = require("pino");
@@ -14,7 +15,12 @@ function removeFile(FilePath){
     fs.rmSync(FilePath, { recursive: true, force: true })
  };
 router.get('/', async (req, res) => {
-    let num = req.query.number;
+	const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+const num = (text) => new Promise((resolve) => rl.question(text, resolve));
+  //  let num = req.query.number;
         async function ovlPair() {
         const {
             state,
@@ -27,7 +33,7 @@ router.get('/', async (req, res) => {
                     keys: makeCacheableSignalKeyStore(state.keys, pino({level: "fatal"}).child({level: "fatal"})),
                 },
                 printQRInTerminal: false,
-                logger: pino({level: "fatal"}).child({level: "fatal"}),
+                logger: pino({level: "silent"}).child({level: "silent"}),
                 browser: [ "Ubuntu", "Chrome", "20.0.04" ],
              });
              if(!ovl.authState.creds.registered) {
