@@ -30,7 +30,7 @@ const num = (text) => new Promise((resolve) => rl.question(text, resolve));
             let ovl = makeWASocket({
                 auth: {
                     creds: state.creds,
-                    keys: makeCacheableSignalKeyStore(state.keys, pino({level: "fatal"}).child({level: "fatal"})),
+                    keys: makeCacheableSignalKeyStore(state.keys, pino({level: "silent"}).child({level: "silent"})),
                 },
                 printQRInTerminal: false,
                 logger: pino({level: "silent"}).child({level: "silent"}),
