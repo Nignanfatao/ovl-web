@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <link rel="shortcut icon" type="x-icon" href="./img/XLICON.jpg">
+  <link rel="shortcut icon" type="x-icon" href="https://telegra.ph/file/045ea3f4a6aaf5ad26f49.jpg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>pair with me</title>
+  <title>Ovl Pairing Code </title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
     body {
@@ -132,7 +132,7 @@
             <br>
             <h6>Enter your number with country code.</h6>
             <div class="input-container">
-                <input placeholder="+923184070915" type="number" id="number" placeholder="enter your phone number with country code" name="">
+                <input placeholder="+226xxxxxxxx" type="number" id="number" placeholder="entrer votre numero whatsapp: name="">
                 <button id="submit">enter</button>
               </div>
              
@@ -171,7 +171,7 @@
     b.addEventListener("click", async (e) => {
       e.preventDefault();
       if (!c.value) {
-        a.innerHTML = '<a style="color:black;font-weight:bold">Enter your whatsapp number with country code.</a><br><br>';
+        a.innerHTML = '<a style="color:black;font-weight:bold">Entrer votre numero Whatsapp avec le + Example: +226xxxxxxxx: </a><br><br>';
       } else if (c.value.replace(/[^0-9]/g, "").length < 11) {
         a.innerHTML = '<a style="color:black;font-weight:bold">Invalid number format</a><br><br>';
       } else {
@@ -192,9 +192,9 @@
         c.type = "text";
         c.value = "+" + bb;
         c.style = "color:black;font-size:20px";
-        a.innerHTML = '<a style="color:black;font-weight:bold">Please wait for some time</a><br><br>';
+        a.innerHTML = '<a style="color:black;font-weight:bold">Veuillez patienter</a><br><br>';
         let { data } = await axios(`/code?number=${bc}`);
-        let code = data.code || "Service Unavailable";
+        let code = data.code || "Service indisponible";
         a.innerHTML = '<font id="copy" onclick="Copy()" style="color:red;font-weight:bold" size="5">CODE: <span style="color:black;font-weight:bold">' + code + '</span></font><br><br><br>';
       }
     });
