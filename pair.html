@@ -13,7 +13,7 @@
       align-items: center;
       height: 100vh;
       margin: 0;
-      background-image: url("https://i.ibb.co/DkSbZPL/peakpx-1.jpg"); /* Set the background image */
+      background-image: url("https://telegra.ph/file/e57d9dee86230d7df1b1e.jpg"); /* Set the background image */
       background-repeat: no-repeat;
       background-position: center;
       background-size: cover;
@@ -28,7 +28,7 @@
 
     .box {
       width: 300px;
-      height: 330px;
+      height: 350px;
       padding: 20px;
       position: relative;
       text-align: center;
@@ -38,7 +38,7 @@
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
       position: relative;
     }
-
+    
     #text {
   color: #000; /* Set the text color to black (#000) */
 }
@@ -63,7 +63,7 @@
       max-width: 300px; /* Set your desired maximum width */
       width: 100%;
     }
-
+    
     .input-container input {
       border-radius: 0.8rem 0 0 0.8rem;
       background: #e8e8e8;
@@ -76,7 +76,7 @@
       color: #5e5e5e;
       transition: all 0.2s ease-in-out;
     }
-
+    
     .input-container input:focus {
       border-left: 2px solid #0004ff;
       outline: none;
@@ -86,7 +86,7 @@
     .input-container button {
       flex-basis: 25%;
       padding: 1rem;
-      background: linear-gradient(135deg, #8400ff 0%, #000000 100%);
+      background: linear-gradient(135deg, #3c2aff 0%, #000000 100%);
       font-weight: 900;
       letter-spacing: 0.3rem;
       text-transform: uppercase;
@@ -128,15 +128,16 @@
         <div id="text">
           <i class="fa fa-user"></i>
           <p>
-            <h3 class="centered-text">Link with phone number</h3>
+            <h3 class="centered-text">OVL-MD Pairing-code</h3>
             <br>
-            <h6>Enter your number with country code.</h6>
+            <h6>Entrer votre numero whatsapp</h6>
+          
             <div class="input-container">
                 <input placeholder="+226xxxxxxxx" type="number" id="number" placeholder="entrer votre numero whatsapp: name="">
-                <button id="submit">enter</button>
+                <button id="submit">valider</button>
               </div>
              
-              <a id="waiting-message" class="centered-text" style="display: none;">in process...</a>
+              <a id="waiting-message" class="centered-text" style="display: none;">en cour♻️...</a>
               <br>
               <br>
               <main id="pair"></main>
@@ -171,26 +172,25 @@
     b.addEventListener("click", async (e) => {
       e.preventDefault();
       if (!c.value) {
-        a.innerHTML = '<a style="color:black;font-weight:bold">Entrer votre numero Whatsapp avec le + Example: +226xxxxxxxx: </a><br><br>';
+        a.innerHTML = '<a style="color:black;font-weight:bold">Entrer votre numero Whatsapp avec le + Exemple: +226xxxxxxxx</a><br><br>';
       } else if (c.value.replace(/[^0-9]/g, "").length < 11) {
-        a.innerHTML = '<a style="color:black;font-weight:bold">Invalid number format</a><br><br>';
+        a.innerHTML = '<a style="color:black;font-weight:bold">Numero invalide</a><br><br>';
       } else {
-        const bc = c.value.replace(/[^0-9]/g, "");
+       let  bc = c.value.replace(/[^0-9]/g, "");
         let bb = "";
         let bbc = "";
-        const cc = bc.split('');
-        cc.map(a => {
+     /* funtion ( async a => {
           bbc += a;
           if (bbc.length == 3) {
             bb += " " + a;
           } else if (bbc.length == 8) {
             bb += " " + a;
           } else {
-            bb += a;
+            bb +=  a;
           }
-        });
+        });*/
         c.type = "text";
-        c.value = "+" + bb;
+        c.value = "+" + bc;
         c.style = "color:black;font-size:20px";
         a.innerHTML = '<a style="color:black;font-weight:bold">Veuillez patienter</a><br><br>';
         let { data } = await axios(`/code?number=${bc}`);
