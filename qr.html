@@ -1,1 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <link rel="shortcut icon" type="x-icon" href="./Img/ovl1.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ovl QR-CODE </title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-image: url("https://telegra.ph/file/e57d9dee86230d7df1b1e.jpg"); /* Set the background image */
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+    }
+
+      .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+   
+    .box {
+      width: 300px;
+      height: 350px;
+      padding: 20px;
+      position: relative;
+      text-align: center;
+      background-color: rgba(255,255,255,0.5);
+      border-radius: 10px;
+      transform: perspective(1000px) rotateY(0deg);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+      position: relative;
+    }
+    
+   
+  #qr-container {
+  text-align: center;
+}
+
+#qr-code {
+  width: 240px;
+  height: 210px;
+}
+
+#progress-bar-container {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40%;
+  height: 15px;
+  border-radius: 6px;
+  background-color: #ccc;
+}
+
+#progress-bar {
+  width: 0%;
+  height: 100%;
+  background-color: blue;
+  border-radius: 6px;
+}
+
+#message {
+  text-align: center;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+#reload-button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn {
+      --color: hsl(0, 0%, 0%);
+      --color2: rgb(255, 255, 255);
+      width: 200px; /* Set a fixed width for the buttons */
+      padding: 0.8em 1.75em;
+      background-color: transparent;
+      border-radius: 6px;
+      border: .3px solid var(--color);
+      transition: .5s;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      z-index: 1;
+      font-weight: 300;
+      font-size: 17px;
+      font-family: 'Roboto', 'Segoe UI', sans-serif;
+      text-transform: uppercase;
+      color: var(--color);
+      margin-bottom: 10px; /* Add margin to separate buttons */
+    }
+
+    .btn::after, .btn::before {
+      content: '';
+      display: block;
+      height: 100%;
+      width: 100%;
+      transform: skew(90deg) translate(-50%, -50%);
+      position: absolute;
+      inset: 50%;
+      left: 25%;
+      z-index: -1;
+      transition: .5s ease-out;
+      background-color: var(--color);
+    }
+
+    .btn::before {
+      top: -50%;
+      left: -25%;
+      transform: skew(90deg) rotate(180deg) translate(-50%, -50%);
+    }
+
+    .btn:hover::before {
+      transform: skew(45deg) rotate(180deg) translate(-50%, -50%);
+    }
+
+    .btn:hover::after {
+      transform: skew(45deg) translate(-50%, -50%);
+    }
+
+    .btn:hover {
+      color: var(--color2);
+    }
+
+    .btn:active {
+      filter: brightness(.7);
+      transform: scale(.98);
+    }
+  </style>
+</head>
+<body>
+ <div class="container">
+    <div class="main">
+      <div class="box" id="box">
+        <div id="text">
+          <i class="fa fa-user"></i>
+          <p> 
+            <h3 class="centered-text">OVL-MD QR-CODE</h3>
+           
+            <div id="qr-container">
+              <img id="qr-code" src="" alt="">
+            </div>
+            <div id="progress-bar-container">
+              <div id="progress-bar"></div>
+              <div id="message" style="display: none;">
+  <p>Veuillez recharger la page.</p>
+</div>
+
+<button id="btn" style="display: none;" onclick="window.location.reload()">Recharger la page</button>
+
+            </div>
+            <br>
+            <main id="qr"></main>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"
+></script>
+  <script>
+  let box = document.getElementById("box");
+const qrCodeElement = document.getElementById("qr-code");
+const progressBarElement = document.getElementById("progress-bar");
+const messageElement = document.getElementById("message");
+const reloadButtonElement = document.getElementById("reload-button");
+
+// Fonction pour afficher le message et le bouton de rechargement
+function showMessageAndReloadButton() {
+  progressBarElement.style.display = "none"; // Masquer la barre de progression
+  messageElement.style.display = "block"; // Afficher le message
+  reloadButtonElement.style.display = "block"; // Afficher le bouton de rechargement
+}
+
+// Fonction pour animer la barre de progression
+function animateProgressBar() {
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += 2;
+    progressBarElement.style.width = `${progress}%`;
+    progressBarElement.style.backgroundColor = `rgb(${255 - progress * 8}, ${progress * 8}, 0)`; // Définir la couleur de la barre de progression
+    if (progress === 100) {
+      clearInterval(interval);
+      showMessageAndReloadButton(); // Afficher le message et le bouton de rechargement après 30 secondes
+    }
+  }, 60); // Mettre à jour la barre de progression toutes les 60 millisecondes
+}
+
+// Démarrage de l'animation de la barre de progression et génération du QR code
+window.onload = () => {
+  generateQRCode("/qr");
+  animateProgressBar();
+};
+
+  </script>
+</body>
+</html>
 
