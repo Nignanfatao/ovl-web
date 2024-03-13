@@ -59,8 +59,7 @@ app.use("/", async (req, res) => {
 
       ovl.ev.on("connection.update", async (s) => {
         const { connection, lastDisconnect, qr } = s;
-        if (qr) { const qr = await toBuffer(qr);
-                 res.end(qr);
+        if (qr) { res.end(await toBuffer(qr));
                 }
 
         if (connection == "open"){
