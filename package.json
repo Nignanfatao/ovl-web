@@ -1,12 +1,12 @@
 {
     "description": "whatsapp pair code and Qr-code generator by Fatao",
-    "main": "./index.js",
+    "main": "/index.js",
   "engines" : { 
     "npm" : ">=9.7.2",
     "node" : ">=20.0.0"
     },
     "scripts": {
-    "start": "node pair.js"
+    "start": "node pair.js && node qr.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^6.5.0",
@@ -26,6 +26,4 @@
     "type": "git",
     "url": "git+https://github.dev/Nignanfatao/ovl-web.git"
   }
-}
-    
 }
