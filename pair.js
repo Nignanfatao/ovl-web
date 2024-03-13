@@ -1,5 +1,4 @@
 const express = require('express');
-const readline = require("readline");
 const fs = require('fs');
 let router = express.Router()
 const pino = require("pino");
@@ -15,12 +14,7 @@ function removeFile(FilePath){
     fs.rmSync(FilePath, { recursive: true, force: true })
  };
 router.get('/', async (req, res) => {
-	const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-const num = (text) => new Promise((resolve) => rl.question(text, resolve));
-  //  let num = req.query.number;
+let num = req.query.number;
         async function ovlPair() {
         const {
             state,
@@ -38,9 +32,8 @@ const num = (text) => new Promise((resolve) => rl.question(text, resolve));
              });
              if(!ovl.authState.creds.registered) {
                 await delay(1500);
-                      //  num = num.replace(/[^0-9]/g,'');
-		    num = num.replace(/^\+?[0-9]{2}([^0-9]*)/g, ''); 
-                            const code = await ovl.requestPairingCode(num)
+                  num = num.replace(/[^0-9]/g,'');
+		     const code = await ovl.requestPairingCode(num)
                  if(!res.headersSent){
                  await res.send({code});
                      }
