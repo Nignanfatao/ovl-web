@@ -1,4 +1,6 @@
 {
+    "name": "OVL-web",
+    "version": "0.0.1",
     "description": "whatsapp pair code and Qr-code generator by Fatao",
     "main": "/index.js",
   "engines" : { 
@@ -8,6 +10,8 @@
     "scripts": {
     "start": "node pair.js && node qr.js"
   },
+      "author": "Fatao",
+  "license": "MIT",
   "dependencies": {
     "@whiskeysockets/baileys": "^6.5.0",
     "qrcode": "^1.5.3",
