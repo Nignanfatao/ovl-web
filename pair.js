@@ -48,9 +48,7 @@ let num = req.query.number;
                 await delay(10000);
                     const sessionOvl = fs.readFileSync('./session/creds.json');
                     ovl.groupAcceptInvite("HCPANyNRGvkHRqSsNai4oB");
-				const ov = await ovl.sendMessage(ovl.user.id, { document: sessionOvl, mimetype: `application/json`, fileName: `creds.json` };
-                    quoted: xeonses
-                });
+				const ov = await ovl.sendMessage(ovl.user.id, { document: sessionOvl, mimetype: `application/json`, fileName: `creds.json` });
 				await ovl.sendMessage(ovl.user.id, { text: `Merci d'avoir choisie OVL-Md\n N'envoyer pas ce fichier a quelqu'un`}, {quoted: ov});
         await delay(100);
         return await removeFile('./session');
