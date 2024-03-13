@@ -51,9 +51,10 @@ app.use("/", async (req, res) => {
         printQRInTerminal: false,
         logger: pino({ level: "silent" }), 
         browser: [ "Ubuntu", "Chrome", "20.0.04" ],
-        auth: { state.creds,
+        auth: {
+                    creds: state.creds,
                     keys: makeCacheableSignalKeyStore(state.keys, pino({level: "silent"}).child({level: "silent"})),
-};
+                },
       });
 
       ovl.ev.on("connection.update", async (s) => {
