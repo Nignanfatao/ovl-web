@@ -164,7 +164,7 @@
 
             </div>
             <br>
-            <main id="qr"></main>
+            <main id="/qr"></main>
           </p>
         </div>
       </div>
@@ -200,10 +200,14 @@ function animateProgressBar() {
     }
   }, 60); // Mettre à jour la barre de progression toutes les 60 millisecondes
 }
+    
+function generateQRCode() {
+  qrCodeElement.src = require('/qr');
+}
 
 // Démarrage de l'animation de la barre de progression et génération du QR code
 window.onload = () => {
-  generateQRCode("/qr");
+  generateQRCode;
   animateProgressBar();
 };
 
