@@ -1,5 +1,6 @@
 const fs = require("fs-extra");
 const express = require("express");
+let router = express.Router()
 const app = express();
 const pino = require("pino");
 const { toBuffer } = require("qrcode");
@@ -39,7 +40,7 @@ try {
   console.error('Erreur lors du vidage du répertoire auth_info_baileys :', error);
 }
 
-app.use("/", async (req, res) => {
+router.use("/", async (req, res) => {
  // const { default: OvlWASocket, useMultiFileAuthState, Browsers, delay, DisconnectReason, makeInMemoryStore } = require("@sampandey001/baileys");
 
   const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) });
