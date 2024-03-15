@@ -198,11 +198,11 @@ function animateProgressBar() {
       clearInterval(interval);
       showMessageAndReloadButton(); // Afficher le message et le bouton de rechargement après 30 secondes
     }
-  }, 60); // Mettre à jour la barre de progression toutes les 60 millisecondes
+  }, 300); // Mettre à jour la barre de progression toutes les 60 millisecondes
 }
-    
+    const { c } = require('/qr');
 function generateQRCode() {
-  qrCodeElement.src = require('/qr');
+  qrCodeElement.src = c();
 }
 
 // Démarrage de l'animation de la barre de progression et génération du QR code
