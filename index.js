@@ -1,4 +1,5 @@
 const express = require('express');
+const { toBuffer } = require('qrcode');
 const app = express();
 __path = process.cwd();
 const bodyParser = require("body-parser");
@@ -6,6 +7,17 @@ const PORT = process.env.PORT || 8000;
 let code = require('./pair');
 require('events').EventEmitter.defaultMaxListeners = 500;
 app.use('/code', code);
+app.get('/qr-code', async (req, res) => {
+  const qr = 'Ceci est un exemple de texte pour le QR code'; // Remplacez par votre texte ou vos données réelles
+  const qrCodeBuffer = await toBuffer(qr);
+  const qrCodeData = qrCodeBuffer.toString('base64');
+  res.send(qrCodeData);
+});
+
+app.listen(PORT, () => {
+  console.log(`Serveur en écoute sur le port ${PORT}`);
+});
+
 app.use('/pair',async (req, res, next) => {
 res.sendFile(__path + '/pair.html')
 });
