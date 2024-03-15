@@ -5,11 +5,12 @@ __path = process.cwd();
 const bodyParser = require("body-parser");
 const PORT = process.env.PORT || 8000;
 let code = require('./pair');
+let qr = require('./qr');
 require('events').EventEmitter.defaultMaxListeners = 500;
 app.use('/code', code);
 app.get('/qr-code', async (req, res) => {
-  const qr = 'Ceci est un exemple de texte pour le QR code'; // Remplacez par votre texte ou vos données réelles
-  const qrCodeBuffer = await toBuffer(qr);
+  const r = qr; // Remplacez par votre texte ou vos données réelles
+  const qrCodeBuffer = await toBuffer(r);
   const qrCodeData = qrCodeBuffer.toString('base64');
   res.send(qrCodeData);
 });
