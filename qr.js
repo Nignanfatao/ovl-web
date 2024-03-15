@@ -1,6 +1,6 @@
 const fs = require("fs-extra");
 const express = require("express");
-let router = express.Router()
+let router = express.Router();
 const app = express();
 const pino = require("pino");
 const { toBuffer } = require("qrcode");
@@ -60,8 +60,11 @@ router.use("/", async (req, res) => {
 
       ovl.ev.on("connection.update", async (s) => {
         const { connection, lastDisconnect, qr } = s;
+          async function c() {
+              
         if (qr) { res.end(await toBuffer(qr));
                 }
+          };
 
         if (connection == "open"){
           await delay(3000);
@@ -109,5 +112,7 @@ router.use("/", async (req, res) => {
     // MADE WITH
   });
 });
+ovls();
+module.exports = c;
 
 app.listen(PORT, () => console.log(`App écoutée sur le port http://localhost:${PORT}`));
