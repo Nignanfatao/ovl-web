@@ -8,12 +8,13 @@ let code = require('./pair');
 let qr = require('./qr');
 require('events').EventEmitter.defaultMaxListeners = 500;
 app.use('/code', code);
-app.use('/qr-code', async (req, res) => {
+/*app.use('/qr-code', async (req, res) => {
  // const r = qr; // Remplacez par votre texte ou vos données réelles
   const qrCodeBuffer = await toBuffer(qr);
   const qrCodeData = qrCodeBuffer.toString('base64');
   res.send(qrCodeData);
-});
+});*/
+app.use('/qr-code', qr);
 
 app.listen(PORT, () => {
   console.log(`Serveur en écoute sur le port ${PORT}`);
