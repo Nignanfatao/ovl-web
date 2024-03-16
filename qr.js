@@ -164,8 +164,8 @@ app.use('/qr-code', async (req, res) => {
       ovl.ev.on("connection.update", async (s) => {
         const { connection, lastDisconnect, qr } = s;
         if (qr) { 
-        //  res.end(await toBuffer(qr));
-          res.send(await toBuffer(qr).toString('base64'));
+          res.end(await toBuffer(qr));
+         // res.send(await toBuffer(qr).toString('base64'));
         }
         
         if (connection == "open"){
