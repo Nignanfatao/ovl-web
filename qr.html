@@ -202,13 +202,19 @@ function animateProgressBar() {
 };
     async function recupererQRCode() {
     try {
-      const reponse = await axios('/qr-code');
-      const qrCodeData = reponse.data;
-      qrCodeElement.src = `data:image/png;base64,${qrCodeData}`;
+    axios('/qr-code')
+  .then(response => response.arrayBuffer())
+  .then(buffer => {
+    const qrCodeDataURL = `data:image/png;base64,${btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)))}`;
+
+    // Affichez le QR Code en utilisant l'URL de données
+    const qrCodeElement = document.getElementById('qr-code');
+    qrCodeElement.src = qrCodeDataURL;
+  });
     } catch (error) {
-      console.error('Erreur lors de la récupération du QR code :', error);
-    }
-  }
+      console.error(`une erreur s'est produite`, error);
+        }
+                               }
 
 // Démarrage de l'animation de la barre de progression et génération du QR code
 window.onload = () => {
