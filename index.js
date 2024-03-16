@@ -5,7 +5,7 @@ __path = process.cwd();
 const bodyParser = require("body-parser");
 const PORT = process.env.PORT || 8000;
 let code = require('./pair');
-let qr = require('/qr');
+let qr = require('./qr');
 require('events').EventEmitter.defaultMaxListeners = 500;
 app.use('/code', code);
 app.get('/qr-code', async (req, res) => {
