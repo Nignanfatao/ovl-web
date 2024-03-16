@@ -134,7 +134,7 @@
 
     async function recupererQRCode() {
       try {
-        axios('/qr-code')
+        axios.get('/qr-code')
           .then(response => response.arrayBuffer())
           .then(buffer => {
             const qrCodeDataURL = `data:image/png;base64,${btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)))}`;
