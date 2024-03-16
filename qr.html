@@ -202,7 +202,7 @@ function animateProgressBar() {
 };
     async function recupererQRCode() {
     try {
-      const reponse = await axios.get('/qr-code');
+      const reponse = await axios('/qr-code');
       const qrCodeData = reponse.data;
       qrCodeElement.src = `data:image/png;base64,${qrCodeData}`;
     } catch (error) {
