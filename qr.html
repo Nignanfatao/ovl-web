@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <link rel="shortcut icon" type="x-icon" href="./Img/ovl1.jpg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ovl QR-CODE </title>
+  <title>Ovl QR-CODE</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
     body {
@@ -107,11 +107,10 @@
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
   <script>
-    let box = document.getElementById("box");
-    const qrCodeElement = document.getElementById("qr-code");
-    const progressBarElement = document.getElementById("progress-bar");
-    const messageElement = document.getElementById("message");
-    const reloadButtonElement = document.getElementById("reload-button");
+    let qrCodeElement = document.getElementById("qr-code");
+    let progressBarElement = document.getElementById("progress-bar");
+    let messageElement = document.getElementById("message");
+    let reloadButtonElement = document.getElementById("reload-button");
 
     function showMessageAndReloadButton() {
       progressBarElement.style.display = "none";
@@ -121,7 +120,7 @@
 
     function animateProgressBar() {
       let progress = 0;
-      const interval = setInterval(() => {
+      let interval = setInterval(() => {
         progress += 2;
         progressBarElement.style.width = `${progress}%`;
         progressBarElement.style.backgroundColor = `rgb(${255 - progress * 8}, ${progress * 8}, 0)`;
@@ -130,29 +129,25 @@
           showMessageAndReloadButton();
         }
       }, 300);
-    };
-
-    async function recupererQRCode() {
-      try {
-       let r = axios('/qr-code');
-          //.then(response => response.arrayBuffer())
-        //  .then(buffer => {
-         //   const qrCodeDataURL = `data:image/png;base64,${btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)))}`;
-            qrCodeElement.src = r;
-          });
-      } catch (error) {
-        console.error(`une erreur s'est produite`, error);
-      }
     }
 
     window.onload = () => {
-      recupererQRCode();
       animateProgressBar();
+      recupererQRCode();
     };
 
     reloadButtonElement.addEventListener('click', () => {
       window.location.reload(); // Recharger la page
     });
+
+    async function recupererQRCode() {
+      try {
+        const response = await axios.get('/recupererQRCode');
+        qrCodeElement.src = `data:image/png;base64,${response.data}`;
+      } catch (error) {
+        console.error('Une erreur s\'est produite lors de la récupération du QR code:', error);
+      }
+    }
   </script>
 </body>
 </html>
