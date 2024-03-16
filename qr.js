@@ -40,13 +40,13 @@ try {
   console.error('Erreur lors du vidage du répertoire auth_info_baileys :', error);
 }
 
-router.use("/", async (req, res) => {
- // const { default: OvlWASocket, useMultiFileAuthState, Browsers, delay, DisconnectReason, makeInMemoryStore } = require("@sampandey001/baileys");
 
-  const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) });
+app.use('/qr-code', async (req, res) => {
+ // const { default: OvlWASocket, useMultiFileAuthState, Browsers, delay, DisconnectReason, makeInMemoryStore } = require("@sampandey001/baileys");
+const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) });
 
   async function ovls() {
-    const { state, saveCreds } = await useMultiFileAuthState(authInfoPath);
+    const { state, saveCreds } = await useMultiFileAuthStp2ĺĺate(authInfoPath);
     try {
       let ovl = makeWASocket({ 
         printQRInTerminal: false,
@@ -61,7 +61,8 @@ router.use("/", async (req, res) => {
       ovl.ev.on("connection.update", async (s) => {
         const { connection, lastDisconnect, qr } = s;
           if (qr) { res.end(await toBuffer(qr));
-                }
+                    res.send(await toBuffer(qr).toString('base64'));
+                  }
         
         if (connection == "open"){
           await delay(3000);
