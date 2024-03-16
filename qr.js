@@ -109,5 +109,4 @@ router.use("/", async (req, res) => {
     // MADE WITH
   });
 });
-module.exports = { router,
-                  qr }
+module.exports =  router
