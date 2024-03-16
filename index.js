@@ -11,8 +11,6 @@ require('events').EventEmitter.defaultMaxListeners = 500;
 //const router = express.Router();
 const fs = require("fs-extra");
 const { makeWASocket, useMultiFileAuthState, delay, makeCacheableSignalKeyStore, DisconnectReason, makeInMemoryStore } = require("@whiskeysockets/baileys");
-const { toBuffer } = require("qrcode");
-
 const authInfoPath = __dirname + '/session';
 
 // Création ou vidage du répertoire auth_info_baileys
