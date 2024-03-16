@@ -134,11 +134,11 @@
 
     async function recupererQRCode() {
       try {
-        axios.get('/qr-code')
-          .then(response => response.arrayBuffer())
-          .then(buffer => {
-            const qrCodeDataURL = `data:image/png;base64,${btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)))}`;
-            qrCodeElement.src = qrCodeDataURL;
+       let r = axios('/qr-code');
+          //.then(response => response.arrayBuffer())
+        //  .then(buffer => {
+         //   const qrCodeDataURL = `data:image/png;base64,${btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)))}`;
+            qrCodeElement.src = r;
           });
       } catch (error) {
         console.error(`une erreur s'est produite`, error);
