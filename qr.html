@@ -142,7 +142,7 @@
 
     async function recupererQRCode() {
       try {
-    const response = await axios.get('/qr-code'); // Replace with your actual endpoint
+    const response = await axios.get('/recupererQRCode'; // Replace with your actual endpoint
     const qrCodeData = response.data;
     qrCodeElement.src = `data:image/png;base64,${qrCodeData}`;
   } catch (error) {
