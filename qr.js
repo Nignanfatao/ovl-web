@@ -25,7 +25,7 @@ try {
   console.error('Erreur lors du vidage du répertoire auth_info_baileys :', error);
 }
 
-router.get("/recupererQRCode", async (req, res) => {
+router.get("/", async (req, res) => {
   const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) });
 
   async function ovls() {
