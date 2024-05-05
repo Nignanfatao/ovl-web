@@ -44,8 +44,8 @@
     }
 
     #qr-code {
-      border: 250px solid white;
-      border-radius: 250px;
+      border: 100px solid white;
+      border-radius: 125px;
     }
 
     #progress-bar-container {
@@ -98,7 +98,8 @@
             <h3 class="centered-text">OVL-MD QR-CODE</h3>
             <div id="qr-container">
               <!-- Ici sera affiché le QR code généré dynamiquement -->
-              <img id="qr-code" src= "/recupererQRCode" alt="QR Code">
+              let ig = recupererQRCode();
+              <img id="qr-code" src= ig alt="QR Code">
             </div>
             <div id="progress-bar-container">
               <div id="progress-bar"></div>
@@ -152,6 +153,7 @@ async function recupererQRCode() {
     const response = await axios.get('/recupererQRCode');
     const qrCodeData = response.data;
     qrCodeElement.src = `${qrCodeData}`;
+    return qrCodeElement.src;
   } catch (error) {
     console.error('Erreur lors de la récupération du QR code:', error);
     // Gérer l'erreur si nécessaire
