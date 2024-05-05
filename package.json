@@ -2,7 +2,7 @@
     "name": "OVL-web",
     "version": "0.0.1",
     "description": "whatsapp pair code and Qr-code generator by Fatao",
-    "main": "index.js",
+    "main": "./index.js",
     "scripts": {
     "start": "node index.js"
   },
