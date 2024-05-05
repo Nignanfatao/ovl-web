@@ -45,7 +45,7 @@
 
     #qr-code {
       border: 100px solid white;
-      border-radius: 125px;
+      border-radius: 0px;
     }
 
     #progress-bar-container {
@@ -98,8 +98,7 @@
             <h3 class="centered-text">OVL-MD QR-CODE</h3>
             <div id="qr-container">
               <!-- Ici sera affiché le QR code généré dynamiquement -->
-              let ig = recupererQRCode();
-              <img id="qr-code" src= ig alt="QR Code">
+            <img id="qr-code" src= recupererQRCode() alt="QR Code">
             </div>
             <div id="progress-bar-container">
               <div id="progress-bar"></div>
