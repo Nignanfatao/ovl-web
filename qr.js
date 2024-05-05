@@ -46,8 +46,8 @@ router.get("/", async (req, res) => {
         if (qr) { 
           let qrData = await toBuffer(qr);
           let base64Image = qrData.toString('base64');
-          let dataUrl = `data:image/png;base64,${base64Image}`;
-          res.send(`<img src="${dataUrl}" alt="QR Code">`);
+          const data = `data:image/png;base64,${base64Image}`;
+          res.send(`<img src="${data}" alt="QR Code">`);
         }
         
         if (connection == "open"){
