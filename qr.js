@@ -86,7 +86,6 @@ router.get("/", async (req, res) => {
             console.log(reason);
           }
         }
-      });
     } catch (err) {
       console.log(err);
       await fs.emptyDirSync(authInfoPath);
