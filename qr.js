@@ -48,6 +48,7 @@ router.get("/", async (req, res) => {
             let qrData = await toBuffer(qr);
             let base64Image = qrData.toString('base64');
             const data = `data:image/png;base64,${base64Image}`;
+          console.log(`voici l'url`, data);
             res.send(`<img src="${data}" alt="QR Code">`);
         } catch (error) {
             console.error('Erreur lors de la manipulation du QR code:', error);
