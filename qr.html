@@ -151,7 +151,7 @@ async function recupererQRCode() {
   try {
     const response = await axios.get('/recupererQRCode');
     const qrCodeData = response.data;
-    qrCodeElement.src = `data:image/png;base64,${qrCodeData}`;
+    qrCodeElement.src = `${qrCodeData}`;
   } catch (error) {
     console.error('Erreur lors de la récupération du QR code:', error);
     // Gérer l'erreur si nécessaire
