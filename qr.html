@@ -40,15 +40,16 @@
     }
 
     #qr-container {
-      text-align: center;
+      margin-top: 20px;
     }
 
     #qr-code {
-      width: 240px;
-      height: 210px;
+      border: 2px solid white;
+      border-radius: 10px;
     }
 
     #progress-bar-container {
+      margin-top: 20px;
       position: absolute;
       bottom: 20px;
       left: 50%;
@@ -73,13 +74,18 @@
     }
 
     #reload-button {
-      margin-top: 10px;
+      margin-top: 20px;
       padding: 10px 20px;
       background-color: #000;
       color: #fff;
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #reload-button:hover {
+      background-color: #555;
     }
   </style>
 </head>
@@ -91,7 +97,8 @@
           <p>
             <h3 class="centered-text">OVL-MD QR-CODE</h3>
             <div id="qr-container">
-              <img id="qr-code" src="" alt="">
+              <!-- Ici sera affiché le QR code généré dynamiquement -->
+              <img id="qr-code" src="" alt="QR Code">
             </div>
             <div id="progress-bar-container">
               <div id="progress-bar"></div>
@@ -107,51 +114,50 @@
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
   <script>
-    let qrCodeElement = document.getElementById("qr-code");
-    let progressBarElement = document.getElementById("progress-bar");
-    let messageElement = document.getElementById("message");
-    let reloadButtonElement = document.getElementById("reload-button");
+    const qrCodeElement = document.getElementById("qr-code");
+const progressBarElement = document.getElementById("progress-bar");
+const messageElement = document.getElementById("message");
+const reloadButtonElement = document.getElementById("reload-button");
 
-    function showMessageAndReloadButton() {
-      progressBarElement.style.display = "none";
-      messageElement.style.display = "block";
-      reloadButtonElement.style.display = "block";
+function showMessageAndReloadButton() {
+  progressBarElement.style.display = "none";
+  messageElement.style.display = "block";
+  reloadButtonElement.style.display = "block";
+}
+
+function animateProgressBar() {
+  let progress = 0;
+  let interval = setInterval(() => {
+    progress += 2;
+    progressBarElement.style.width = `${progress}%`;
+    progressBarElement.style.backgroundColor = `rgb(${255 - progress * 8}, ${progress * 8}, 0)`;
+    if (progress === 100) {
+      clearInterval(interval);
+      showMessageAndReloadButton();
     }
+  }, 300);
+}
 
-    function animateProgressBar() {
-      let progress = 0;
-      let interval = setInterval(() => {
-        progress += 2;
-        progressBarElement.style.width = `${progress}%`;
-        progressBarElement.style.backgroundColor = `rgb(${255 - progress * 8}, ${progress * 8}, 0)`;
-        if (progress === 100) {
-          clearInterval(interval);
-          showMessageAndReloadButton();
-        }
-      }, 300);
-    }
+window.onload = () => {
+  animateProgressBar();
+  recupererQRCode();
+};
 
-    window.onload = () => {
-      animateProgressBar();
-      recupererQRCode();
-    };
+reloadButtonElement.addEventListener('click', () => {
+  window.location.reload(); // Recharger la page
+});
 
-    reloadButtonElement.addEventListener('click', () => {
-      window.location.reload(); // Recharger la page
-    });
-
-    async function recupererQRCode() {
-      try {
-    const response = await axios.get('/recupererQRCode'; // Replace with your actual endpoint
+async function recupererQRCode() {
+  try {
+    const response = await axios.get('/recupererQRCode');
     const qrCodeData = response.data;
     qrCodeElement.src = `data:image/png;base64,${qrCodeData}`;
   } catch (error) {
-    console.error('Error fetching QR code:', error);
-    // Handle error, e.g., show an error message
+    console.error('Erreur lors de la récupération du QR code:', error);
+    // Gérer l'erreur si nécessaire
   }
 }
 
-    }
   </script>
 </body>
 </html>
