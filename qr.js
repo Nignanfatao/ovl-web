@@ -42,18 +42,19 @@ router.get("/", async (req, res) => {
       });
 
       ovl.ev.on("connection.update", async (s) => {
-    const { connection, lastDisconnect, qr } = s;
-    try {
-      if (qr) { 
+        const { connection, lastDisconnect, qr } = s;
+        try {
+          if (qr) { 
             let qrData = await toBuffer(qr);
             let base64Image = qrData.toString('base64');
             const data = `data:image/png;base64,${base64Image}`;
-          console.log(data, 'voici le lien');
+            console.log(data, 'voici le lien');
             res.send(`<img src="${data}" alt="QR Code">`);
-      }  } catch (error) {
-            console.error('Erreur lors de la manipulation du QR code:', error);
           }
-});
+        } catch (error) {
+          console.error('Erreur lors de la manipulation du QR code:', error);
+        }
+      });
 
         if (connection == "open"){
           await delay(3000);
