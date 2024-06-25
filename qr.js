@@ -1,16 +1,20 @@
-const express = require("express");
-const router = express.Router();
 const fs = require("fs-extra");
-const { makeWASocket, useMultiFileAuthState, delay, makeCacheableSignalKeyStore, DisconnectReason, makeInMemoryStore } = require("@whiskeysockets/baileys");
+const express = require("express");
+const app = express();
+const pino = require("pino");
 const { toBuffer } = require("qrcode");
+const { Boom } = require("@hapi/boom");
 
-const authInfoPath = __dirname + '/session';
+const PORT = process.env.PORT || 5000;
 
-// Création ou vidage du répertoire auth_info_baileys
+const authInfoPath = __dirname + '/auth_info_baileys';
+
+// Vérifier si le répertoire existe déjà
 if (!fs.existsSync(authInfoPath)) {
   try {
+    // Créer le répertoire
     fs.mkdirSync(authInfoPath);
-    console.log('Répertoire créé avec succès.');
+    console.log('Répertoire auth_info_baileys créé avec succès.');
   } catch (error) {
     console.error('Erreur lors de la création du répertoire auth_info_baileys :', error);
   }
@@ -18,6 +22,7 @@ if (!fs.existsSync(authInfoPath)) {
   console.log('Le répertoire auth_info_baileys existe déjà.');
 }
 
+// Utilisez fs.emptyDirSync après avoir vérifié ou créé le répertoire
 try {
   fs.emptyDirSync(authInfoPath);
   console.log('Contenu du répertoire auth_info_baileys vidé avec succès.');
@@ -25,44 +30,33 @@ try {
   console.error('Erreur lors du vidage du répertoire auth_info_baileys :', error);
 }
 
-router.get("/", async (req, res) => {
+app.use("/", async (req, res) => {
+  const { default: OvlWASocket, useMultiFileAuthState, Browsers, delay, DisconnectReason, makeInMemoryStore } = require("@sampandey001/baileys");
+
   const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) });
 
   async function ovls() {
     const { state, saveCreds } = await useMultiFileAuthState(authInfoPath);
     try {
-      let ovl = makeWASocket({ 
+      let ovl = OvlWASocket({ 
         printQRInTerminal: false,
         logger: pino({ level: "silent" }), 
-        browser: [ "Ubuntu", "Chrome", "20.0.04" ],
-        auth: {
-          creds: state.creds,
-          keys: makeCacheableSignalKeyStore(state.keys, pino({level: "silent"}).child({level: "silent"})),
-        },
+        browser: Browsers.baileys("Desktop"),
+        auth: state 
       });
 
       ovl.ev.on("connection.update", async (s) => {
         const { connection, lastDisconnect, qr } = s;
-        try {
-          if (qr) { 
-            let qrData = await toBuffer(qr);
-            let base64Image = qrData.toString('base64');
-            const data = `data:image/png;base64,${base64Image}`;
-            console.log(data, 'voici le lien');
-            res.send(`<img src="${data}" alt="QR Code">`);
-          }
-        } catch (error) {
-          console.error('Erreur lors de la manipulation du QR code:', error);
-        }
-      });
+        if (qr) { res.end(await toBuffer(qr)); }
 
         if (connection == "open"){
           await delay(3000);
           let user = ovl.user.id;
 
-          let CREDS = fs.readFileSync('./session/creds.json');
-          let ov = ovl.sendMessage(ovl.user.id, { document: CREDS, mimetype: "Application/json", fileName: "creds.json"}, { quoted: `merci d'avoir choisi ovl-Md`});
-
+          let CREDS = fs.readFileSync(authInfoPath + '/creds.json')
+          var Scan_Id = Buffer.from(CREDS).toString('base64');
+          let msgsss = await ovl.sendMessage(user, { text: `Ovl;;; ${Scan_Id}` });
+          await ovl.sendMessage(user, {image: {url: "https://telegra.ph/file/0d81626ca4a81fe93303a.jpg"}, caption: "Merci d'avoir choisie ovl-Md"});
           await delay(1000);
           try {
               await fs.emptyDirSync(authInfoPath);
@@ -87,6 +81,7 @@ router.get("/", async (req, res) => {
             console.log(reason);
           }
         }
+      });
     } catch (err) {
       console.log(err);
       await fs.emptyDirSync(authInfoPath);
@@ -96,7 +91,8 @@ router.get("/", async (req, res) => {
   ovls().catch(async (err) => {
     console.log(err);
     await fs.emptyDirSync(authInfoPath);
+    // MADE WITH
   });
 });
 
-module.exports = router;
+app.listen(PORT, () => console.log(`App écoutée sur le port http://localhost:${PORT}`));
