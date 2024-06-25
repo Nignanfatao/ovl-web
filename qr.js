@@ -1,5 +1,6 @@
 const fs = require("fs-extra");
 const express = require("express");
+let router = express.Router()
 const app = express();
 const pino = require("pino");
 const { toBuffer } = require("qrcode");
