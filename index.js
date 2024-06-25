@@ -11,16 +11,12 @@ let data = require('./qr');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/recupererQRCode', data);
+app.use('/qr', data);
 
 app.use('/code', code);
 
 app.use('/pair', async (req, res, next) => {
     res.sendFile(__path + '/pair.html');
-});
-
-app.use('/qr', async (req, res, next) => {
-    res.sendFile(__path + '/qr.html');
 });
 
 app.use('/deploy', async (req, res, next) => {
