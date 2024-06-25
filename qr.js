@@ -30,7 +30,7 @@ try {
   console.error('Erreur lors du vidage du répertoire auth_info_baileys :', error);
 }
 
-app.use("/", async (req, res) => {
+router.get("/", async (req, res) => {
   const { default: OvlWASocket, useMultiFileAuthState, Browsers, delay, DisconnectReason, makeInMemoryStore } = require("@sampandey001/baileys");
 
   const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) });
@@ -95,4 +95,5 @@ app.use("/", async (req, res) => {
   });
 });
 
-app.listen(PORT, () => console.log(`App écoutée sur le port http://localhost:${PORT}`));
+module.exports = router
+
