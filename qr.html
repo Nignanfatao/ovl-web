@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <link rel="shortcut icon" type="x-icon" href="./Img/ovl1.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ovl QR-CODE</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-image: url("https://telegra.ph/file/117db8e1200cf13d41006.jpg");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .box {
+      width: 300px;
+      height: 350px;
+      padding: 20px;
+      position: relative;
+      text-align: center;
+      background-color: rgba(255,255,255,0.5);
+      border-radius: 10px;
+      transform: perspective(1000px) rotateY(0deg);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+      position: relative;
+    }
+
+    #progress-bar-container {
+      margin-top: 20px;
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40%;
+      height: 15px;
+      border-radius: 6px;
+      background-color: #ccc;
+    }
+
+    #progress-bar {
+      width: 0%;
+      height: 100%;
+      background-color: blue;
+      border-radius: 6px;
+    }
+
+    #reload-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #000;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #reload-button:hover {
+      background-color: #555;
+    }
+
+    #img {
+      width: 250px;
+      height: 250px;
+      background-color: rgba(255,255,255,0.5)
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="main">
+      <div class="box" id="box">
+        <div id="text">
+          <h3 class="centered-text">OVL-MD QR-CODE</h3>
+          <div id="qr-container">
+            <!-- L'image du QR code généré sera ajoutée ici -->
+          </div>
+          <div id="progress-bar-container">
+            <div id="progress-bar"></div>
+            <button id="reload-button" style="display: none;">Recharger la page</button>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+  <script>
+    const progressBarElement = document.getElementById("progress-bar");
+    const reloadButtonElement = document.getElementById("reload-button");
+
+    function showMessageAndReloadButton() {
+      progressBarElement.style.display = "block";
+      reloadButtonElement.style.display = "block";
+    }
+
+    function animateProgressBar() {
+      let progress = 0;
+      let interval = setInterval(() => {
+        progress += 2;
+        progressBarElement.style.width = `${progress}%`;
+        progressBarElement.style.backgroundColor = `rgb(${255 - progress * 8}, ${progress * 8}, 0)`;
+        if (progress === 100) {
+          clearInterval(interval);
+          showMessageAndReloadButton();
+        }
+      }, 300);
+    }
+
+    window.onload = () => {
+      animateProgressBar();
+      fetchQRCode(); // Appel de la fonction pour récupérer le QR code
+    };
+
+    reloadButtonElement.addEventListener('click', () => {
+      window.location.reload(); // Recharger la page
+    });
+
+    async function fetchQRCode() {
+      try {
+        const response = await axios.get('/qr'); // URL où est exposée l'API du QR code
+        const qrImageBase64 = response.data;
+        const qrImageElement = document.createElement('img');
+        qrImageElement.src = `data:image/png;base64, ${qrImageBase64}`;
+        qrImageElement.style.maxWidth = '100%';
+        document.getElementById('qr-container').appendChild(qrImageElement);
+      } catch (error) {
+        console.error('Erreur lors de la récupération du QR code :', error);
+      }
+    }
+  </script>
+</body>
+</html>
