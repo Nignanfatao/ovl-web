@@ -6,17 +6,21 @@ const PORT = process.env.PORT || 8000;
 let code = require('./pair');
 require('events').EventEmitter.defaultMaxListeners = 500;
 app.use('/code', code);
-let data = require('./qr');
+const router = require('./qr');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/qr', data);
+app.use('/qr', router);
 
 app.use('/code', code);
 
 app.use('/pair', async (req, res, next) => {
     res.sendFile(__path + '/pair.html');
+});
+
+app.use('/qrcode', (req, res) => {
+    res.sendFile(__dirname + '/qr.html');
 });
 
 app.use('/deploy', async (req, res, next) => {
