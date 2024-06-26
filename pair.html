@@ -1,105 +1,140 @@
-const express = require('express');
-const router = express.Router();
-const fs = require('fs-extra');
-const pino = require('pino');
-const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers } = require('@whiskeysockets/baileys');
-const { Boom } = require('@hapi/boom');
-const { toDataURL } = require('qrcode');
-const { delay } = require('@whiskeysockets/baileys');
-
-// Chemin pour stocker les informations d'authentification
-const authInfoPath = './auth_info';
-
-router.get('/', async (req, res) => {
-    try {
-        const { state, saveCreds } = await useMultiFileAuthState(authInfoPath);
-
-        // Options de personnalisation du QR code
-        const qrOptions = {
-            width: req.query.width || 270,   // Largeur par défaut ou paramètre personnalisé
-            height: req.query.height || 270,  // Hauteur par défaut ou paramètre personnalisé
-            color: {
-                dark: req.query.darkColor || '#000000',  // Couleur sombre (par défaut noir)
-                light: req.query.lightColor || '#95e0ff' // Couleur claire (par défaut blanc)
-            }
-        };
-
-        let ovl = makeWASocket({
-            printQRInTerminal: false,
-            logger: pino({ level: 'silent' }),
-            browser: Browsers.baileys('Desktop'),
-            auth: state
-        });
-
-        let sent = false; // Variable pour suivre si une réponse a déjà été envoyée
-
-        ovl.ev.on('connection.update', async (s) => {
-            const { connection, lastDisconnect, qr } = s;
-            if (qr && !sent) {
-                try {
-                    // Générer le QR code avec les options personnalisées
-                    const qrDataURL = await toDataURL(qr, qrOptions);
-                    const data = qrDataURL.split(',')[1]; // Envoyer seulement la partie base64 de l'URL
-                    res.send(data);
-                    sent = true; // Marquer que la réponse a été envoyée
-                } catch (err) {
-                    console.error('Erreur lors de la génération du QR code personnalisé :', err);
-                    res.status(500).send('Erreur lors de la génération du QR code personnalisé');
-                    sent = true; // Marquer que la réponse a été envoyée
-                }
-            }
-
-            if (connection === 'open' && !sent) {
-                await delay(3000);
-                let user = ovl.user.id;
-
-                let CREDS = fs.readFileSync(authInfoPath + '/creds.json');
-                var Scan_Id = Buffer.from(CREDS).toString('base64');
-                await ovl.sendMessage(user, { text: `Ovl;;; ${Scan_Id}` });
-                await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/0d81626ca4a81fe93303a.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
-                await delay(1000);
-                try {
-                    await fs.emptyDirSync(authInfoPath);
-                } catch (e) {
-                    console.log('Erreur lors de la suppression des fichiers :', e);
-                }
-            }
-
-            ovl.ev.on('creds.update', saveCreds);
-
-            if (connection === 'close' && !sent) {
-                let reason = new Boom(lastDisconnect?.error)?.output.statusCode;
-                if (reason === DisconnectReason.connectionClosed) {
-                    console.log('Connection fermée');
-                } else if (reason === DisconnectReason.connectionLost) {
-                    console.log('Connection perdue depuis le serveur !');
-                } else if (reason === DisconnectReason.restartRequired) {
-                    console.log('Redémarrage requis, redémarrage en cours...');
-                    ovls().catch((err) => console.log(err));
-                } else if (reason === DisconnectReason.timedOut) {
-                    console.log('Connexion expirée !');
-                } else {
-                    console.log('Connexion fermée avec le bot. Veuillez exécuter à nouveau.');
-                    console.log(reason);
-                }
-                res.status(500).send('Connexion fermée avec le bot. Veuillez exécuter à nouveau.');
-                sent = true; // Marquer que la réponse a été envoyée
-            }
-        });
-
-        // Gestion des erreurs
-        ovl.ev.on('error', (err) => {
-            console.error('Erreur de connexion :', err);
-            if (!sent) {
-                res.status(500).send('Erreur lors de la génération du QR code');
-                sent = true; // Marquer que la réponse a été envoyée
-            }
-        });
-    } catch (err) {
-        console.error('Erreur lors de l\'authentification :', err);
-        await fs.emptyDirSync(authInfoPath);
-        res.status(500).send('Erreur lors de la génération du QR code');
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <link rel="shortcut icon" type="x-icon" href="./Img/ovl1.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ovl Pairing Code </title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-image: url("https://telegra.ph/file/e57d9dee86230d7df1b1e.jpg"); /* Set the background image */
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover;
+      font-family: Arial, sans-serif;
     }
-});
 
-module.exports = router;
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .box {
+      width: 300px;
+      height: 350px;
+      padding: 20px;
+      position: relative;
+      text-align: center;
+      background-color: rgba(255,255,255,0.5);
+      border-radius: 10px;
+      transform: perspective(1000px) rotateY(0deg);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+      position: relative;
+    }
+
+    #text {
+  color: #000; /* Set the text color to black (#000) */
+}
+
+.input-container input {
+  color: #000; /* Set the text color to black (#000) */
+}    @media (max-width: 500px) {
+      .input-container {
+        flex-direction: column;
+      }
+
+      .input-container input {
+        border-radius: 0.8rem;
+      }.input-container button {
+        padding: 1rem;
+        border-radius: 0.8rem;
+      }
+    }
+
+    .centered-text {
+    text-align: center;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="main">
+      <div class="box" id="box">
+        <div id="text">
+          <i class="fa fa-user"></i>
+          <p>
+            <h3 class="centered-text">OVL-MD Pairing-code</h3>
+            <br>
+            <h6>Entrer votre numero whatsapp</h6>
+
+            <div class="input-container">
+                <input placeholder="+226xxxxxxxx" type="number" id="number" placeholder="entrer votre numero whatsapp: name="">
+                <button id="submit">valider</button>
+              </div>
+
+              <a id="waiting-message" class="centered-text" style="display: none;">en cour♻️...</a>
+              <br>
+              <br>
+              <main id="pair"></main>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"
+></script>
+  <script>
+    let a = document.getElementById("pair");
+    let b = document.getElementById("submit");
+    let c = document.getElementById("number");
+    let box = document.getElementById("box");async function Copy() {
+      let text = document.getElementById("copy").innerText;
+      let obj = document.getElementById("copy");
+      await navigator.clipboard.writeText(obj.innerText.replace('CODE: ', ''));
+      obj.innerText = "COPIED";
+      obj.style = "color:blue;font-weight:bold";
+      obj.size = "5";
+      setTimeout(() => {
+        obj.innerText = text;
+        obj.style = "color:black;font-weight-bold";
+        obj.size = "5";
+      }, 500);b.addEventListener("click", async (e) => {
+      e.preventDefault();
+      if (!c.value) {
+        a.innerHTML = '<a style="color:black;font-weight:bold">Entrer votre numero Whatsapp avec le + Exemple: +226xxxxxxxx</a><br><br>';
+      } else if (c.value.replace(/[^0-9]/g, "").length < 11) {
+        a.innerHTML = '<a style="color:black;font-weight:bold">Numero invalide</a><br><br>';
+      } else {
+       let  bc = c.value.replace(/[^0-9]/g, "");
+        let bb = "";
+        let bbc = "";
+     /* funtion ( async a => {
+          bbc += a;
+          if (bbc.length == 3) {
+            bb += " " + a;
+          } else if (bbc.length == 8) {
+            bb += " " + a;
+          } else {
+            bb +=  a;
+          }
+        });*/
+        c.type = "text";
+        c.value = "+" + bc;
+        c.style = "color:black;font-size:20px";
+        a.innerHTML = '<a style="color:black;font-weight:bold">Veuillez patienter</a><br><br>';
+        let { data } = await axios(`/code?number=${bc}`);
+        let code = data.code || "Service indisponible";
+        a.innerHTML = '<font id="copy" onclick="Copy()" style="color:red;font-weight:bold" size="5">CODE: <span style="color:black;font-weight:bold">' + code + '</span></font><br><br><br>';
+      }
+    });
+  </script>
+</body>
+</html>
