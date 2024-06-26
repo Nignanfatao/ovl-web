@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <link rel="shortcut icon" type="x-icon" href="./Img/ovl1.jpg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ovl Pairing Code </title>
+  <title>Ovl Pairing Code</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
     body {
@@ -13,7 +13,7 @@
       align-items: center;
       height: 100vh;
       margin: 0;
-      background-image: url("https://telegra.ph/file/e57d9dee86230d7df1b1e.jpg"); /* Set the background image */
+      background-image: url("https://telegra.ph/file/e57d9dee86230d7df1b1e.jpg");
       background-repeat: no-repeat;
       background-position: center;
       background-size: cover;
@@ -32,35 +32,38 @@
       padding: 20px;
       position: relative;
       text-align: center;
-      background-color: rgba(255,255,255,0.5);
+      background-color: rgba(255, 255, 255, 0.5);
       border-radius: 10px;
       transform: perspective(1000px) rotateY(0deg);
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
-      position: relative;
     }
 
     #text {
-  color: #000; /* Set the text color to black (#000) */
-}
+      color: #000; /* Set the text color to black (#000) */
+    }
 
-.input-container input {
-  color: #000; /* Set the text color to black (#000) */
-}    @media (max-width: 500px) {
+    .input-container input {
+      color: #000; /* Set the text color to black (#000) */
+    }
+
+    @media (max-width: 500px) {
       .input-container {
         flex-direction: column;
       }
 
       .input-container input {
         border-radius: 0.8rem;
-      }.input-container button {
+      }
+      
+      .input-container button {
         padding: 1rem;
         border-radius: 0.8rem;
       }
     }
 
     .centered-text {
-    text-align: center;
-}
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -69,72 +72,62 @@
       <div class="box" id="box">
         <div id="text">
           <i class="fa fa-user"></i>
-          <p>
-            <h3 class="centered-text">OVL-MD Pairing-code</h3>
-            <br>
-            <h6>Entrer votre numero whatsapp</h6>
-
-            <div class="input-container">
-                <input placeholder="+226xxxxxxxx" type="number" id="number" placeholder="entrer votre numero whatsapp: name="">
-                <button id="submit">valider</button>
-              </div>
-
-              <a id="waiting-message" class="centered-text" style="display: none;">en cour♻️...</a>
-              <br>
-              <br>
-              <main id="pair"></main>
-          </p>
+          <h3 class="centered-text">OVL-MD Pairing-code</h3>
+          <br>
+          <h6>Entrer votre numero whatsapp</h6>
+          <div class="input-container">
+            <input placeholder="+226xxxxxxxx" type="number" id="number">
+            <button id="submit">valider</button>
+          </div>
+          <a id="waiting-message" class="centered-text" style="display: none;">en cour♻️...</a>
+          <br>
+          <br>
+          <main id="pair"></main>
         </div>
       </div>
     </div>
   </div>
-  <script
-  src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"
-></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
   <script>
-    let a = document.getElementById("pair");
-    let b = document.getElementById("submit");
-    let c = document.getElementById("number");
-    let box = document.getElementById("box");async function Copy() {
-      let text = document.getElementById("copy").innerText;
-      let obj = document.getElementById("copy");
-      await navigator.clipboard.writeText(obj.innerText.replace('CODE: ', ''));
-      obj.innerText = "COPIED";
-      obj.style = "color:blue;font-weight:bold";
-      obj.size = "5";
-      setTimeout(() => {
-        obj.innerText = text;
-        obj.style = "color:black;font-weight-bold";
-        obj.size = "5";
-      }, 500);b.addEventListener("click", async (e) => {
+    let pairElement = document.getElementById("pair");
+    let submitButton = document.getElementById("submit");
+    let numberInput = document.getElementById("number");
+    let boxElement = document.getElementById("box");
+
+    submitButton.addEventListener("click", async (e) => {
       e.preventDefault();
-      if (!c.value) {
-        a.innerHTML = '<a style="color:black;font-weight:bold">Entrer votre numero Whatsapp avec le + Exemple: +226xxxxxxxx</a><br><br>';
-      } else if (c.value.replace(/[^0-9]/g, "").length < 11) {
-        a.innerHTML = '<a style="color:black;font-weight:bold">Numero invalide</a><br><br>';
+      if (!numberInput.value) {
+        pairElement.innerHTML = '<a style="color:black;font-weight:bold">Entrer votre numero Whatsapp avec le + Exemple: +226xxxxxxxx</a><br><br>';
+      } else if (numberInput.value.replace(/[^0-9]/g, "").length < 11) {
+        pairElement.innerHTML = '<a style="color:black;font-weight:bold">Numero invalide</a><br><br>';
       } else {
-       let  bc = c.value.replace(/[^0-9]/g, "");
-        let bb = "";
-        let bbc = "";
-     /* funtion ( async a => {
-          bbc += a;
-          if (bbc.length == 3) {
-            bb += " " + a;
-          } else if (bbc.length == 8) {
-            bb += " " + a;
-          } else {
-            bb +=  a;
-          }
-        });*/
-        c.type = "text";
-        c.value = "+" + bc;
-        c.style = "color:black;font-size:20px";
-        a.innerHTML = '<a style="color:black;font-weight:bold">Veuillez patienter</a><br><br>';
-        let { data } = await axios(`/code?number=${bc}`);
-        let code = data.code || "Service indisponible";
-        a.innerHTML = '<font id="copy" onclick="Copy()" style="color:red;font-weight:bold" size="5">CODE: <span style="color:black;font-weight:bold">' + code + '</span></font><br><br><br>';
+        let cleanedNumber = numberInput.value.replace(/[^0-9]/g, "");
+        numberInput.type = "text";
+        numberInput.value = "+" + cleanedNumber;
+        numberInput.style = "color:black;font-size:20px";
+        pairElement.innerHTML = '<a style="color:black;font-weight:bold">Veuillez patienter</a><br><br>';
+        
+        try {
+          let response = await axios(`/code?number=${cleanedNumber}`);
+          let code = response.data.code || "Service indisponible";
+          pairElement.innerHTML = `<font id="copy" onclick="Copy()" style="color:red;font-weight:bold" size="5">CODE: <span style="color:black;font-weight:bold">${code}</span></font><br><br><br>`;
+        } catch (error) {
+          pairElement.innerHTML = '<a style="color:black;font-weight:bold">Erreur lors de la génération du code</a><br><br>';
+        }
       }
     });
+
+    async function Copy() {
+      let copyElement = document.getElementById("copy");
+      let originalText = copyElement.innerText;
+      await navigator.clipboard.writeText(copyElement.innerText.replace('CODE: ', ''));
+      copyElement.innerText = "COPIED";
+      copyElement.style = "color:blue;font-weight:bold";
+      setTimeout(() => {
+        copyElement.innerText = originalText;
+        copyElement.style = "color:black;font-weight:bold";
+      }, 500);
+    }
   </script>
 </body>
 </html>
