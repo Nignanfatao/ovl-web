@@ -1,5 +1,4 @@
 const express = require('express');
-const router = express.Router();
 const fs = require('fs-extra');
 const path = require('path');
 const pino = require('pino');
@@ -12,8 +11,15 @@ const {
 const { Boom } = require('@hapi/boom');
 const { toDataURL } = require('qrcode');
 
+const router = express.Router();
+
 // Chemin pour stocker les informations d'authentification
-const authPath = path.join(__dirname, '../auth/qrcode.json');
+const authInfoPath = path.join(__dirname, '../auth/qrcode.json');
+
+function removeFile(filePath) {
+    if (!fs.existsSync(filePath)) return false;
+    fs.rmSync(filePath, { recursive: true, force: true });
+}
 
 router.get('/', async (req, res) => {
     try {
@@ -109,6 +115,18 @@ router.get('/', async (req, res) => {
         fs.emptyDirSync(authInfoPath);
         res.status(500).send('Erreur lors de la génération du QR code');
     }
+});
+
+process.on('uncaughtException', function (err) {
+    let e = String(err);
+    if (e.includes("conflict")) return;
+    if (e.includes("Socket connection timeout")) return;
+    if (e.includes("not-authorized")) return;
+    if (e.includes("rate-overlimit")) return;
+    if (e.includes("Connection Closed")) return;
+    if (e.includes("Timed Out")) return;
+    if (e.includes("Value not found")) return;
+    console.log('Caught exception: ', err);
 });
 
 module.exports = router;
