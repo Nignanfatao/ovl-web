@@ -51,7 +51,7 @@ router.get('/', async (req, res) => {
                     await ovl.groupAcceptInvite("LhnBI1Igg7W1ZgyqT8gIxa");
                     const scanId = Buffer.from(creds).toString('base64');
                     await ovl.sendMessage(user, { text: `Ovl;;; ${scanId}` });
-                    await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/0d81626ca4a81fe93303a.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
+                    await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
                     await delay(100);
                     removeFile(authPath);
                     process.exit(0);
