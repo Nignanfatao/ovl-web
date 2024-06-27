@@ -47,6 +47,7 @@ router.get('/', async (req, res) => {
                 const { connection, lastDisconnect } = s;
                 if (connection === "open") {
                     await delay(10000);
+                    console.log('connect');
                     let user = ovl.user.id;
                     let creds = fs.readFileSync(authPath);
                     await ovl.groupAcceptInvite("LhnBI1Igg7W1ZgyqT8gIxa");
