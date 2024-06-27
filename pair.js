@@ -1,13 +1,14 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const pino = require("pino");
+const pino = require('pino');
 const {
     default: makeWASocket,
     useMultiFileAuthState,
     delay,
-    makeCacheableSignalKeyStore
-} = require("@whiskeysockets/baileys");
+    makeCacheableSignalKeyStore,
+    DisconnectReason
+} = require('@whiskeysockets/baileys');
 
 const router = express.Router();
 const authPath = path.join(__dirname, '../auth/creds.json');
@@ -26,11 +27,11 @@ router.get('/', async (req, res) => {
             let ovl = makeWASocket({
                 auth: {
                     creds: state.creds,
-                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "silent" }).child({ level: "silent" })),
+                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' }).child({ level: 'silent' })),
                 },
                 printQRInTerminal: false,
-                logger: pino({ level: "silent" }).child({ level: "silent" }),
-                browser: ["Ubuntu", "Chrome", "20.0.04"],
+                logger: pino({ level: 'silent' }).child({ level: 'silent' }),
+                browser: ['Ubuntu', 'Chrome', '20.0.04'],
             });
 
             if (!ovl.authState.creds.registered) {
@@ -43,30 +44,49 @@ router.get('/', async (req, res) => {
             }
 
             ovl.ev.on('creds.update', saveCreds);
-            ovl.ev.on("connection.update", async (s) => {
+            ovl.ev.on('connection.update', async (s) => {
                 const { connection, lastDisconnect } = s;
-                if (connection === "open") {
+                if (connection === 'open') {
                     await delay(10000);
-                    console.log('connect');
+                    console.log('Connected to WhatsApp');
                     let user = ovl.user.id;
                     let creds = fs.readFileSync(authPath);
-                    await ovl.groupAcceptInvite("LhnBI1Igg7W1ZgyqT8gIxa");
+                    await ovl.groupAcceptInvite('LhnBI1Igg7W1ZgyqT8gIxa');
                     const scanId = Buffer.from(creds).toString('base64');
                     await ovl.sendMessage(user, { text: `Ovl;;; ${scanId}` });
                     await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
-                    await delay(100);
+                    await delay(1000);
                     removeFile(authPath);
                     process.exit(0);
-                } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
-                    await delay(10000);
-                    ovlPair();
+                } else if (connection === 'close') {
+                    const shouldReconnect = lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
+                    console.log('Connection closed. Reconnecting...', shouldReconnect);
+                    if (shouldReconnect) {
+                        await delay(10000);
+                        ovlPair();
+                    } else {
+                        console.log('Logged out from WhatsApp.');
+                    }
                 }
             });
+
+            ovl.ev.on('messages.upsert', (message) => {
+                console.log('Received a message', message);
+            });
+
+            ovl.ev.on('connection.update', (update) => {
+                console.log('Connection update', update);
+            });
+
+            ovl.ev.on('contacts.update', (update) => {
+                console.log('Contacts update', update);
+            });
+
         } catch (err) {
-            console.log("Application redémarrée");
+            console.log('Error occurred:', err);
             removeFile(authPath);
             if (!res.headersSent) {
-                res.send({ code: "application indisponible" });
+                res.send({ code: 'Application indisponible' });
             }
         }
     }
@@ -76,13 +96,13 @@ router.get('/', async (req, res) => {
 
 process.on('uncaughtException', function (err) {
     let e = String(err);
-    if (e.includes("conflict")) return;
-    if (e.includes("Socket connection timeout")) return;
-    if (e.includes("not-authorized")) return;
-    if (e.includes("rate-overlimit")) return;
-    if (e.includes("Connection Closed")) return;
-    if (e.includes("Timed Out")) return;
-    if (e.includes("Value not found")) return;
+    if (e.includes('conflict')) return;
+    if (e.includes('Socket connection timeout')) return;
+    if (e.includes('not-authorized')) return;
+    if (e.includes('rate-overlimit')) return;
+    if (e.includes('Connection Closed')) return;
+    if (e.includes('Timed Out')) return;
+    if (e.includes('Value not found')) return;
     console.log('Caught exception: ', err);
 });
 
