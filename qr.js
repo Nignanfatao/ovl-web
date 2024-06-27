@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const fs = require('fs-extra');
+const path = require('path');
 const pino = require('pino');
 const {
     default: makeWASocket,
@@ -12,7 +13,7 @@ const { Boom } = require('@hapi/boom');
 const { toDataURL } = require('qrcode');
 
 // Chemin pour stocker les informations d'authentification
-const authInfoPath = '../auth/qrcode.json';
+const authPath = path.join(__dirname, '../auth/qrcode.json');
 
 router.get('/', async (req, res) => {
     try {
