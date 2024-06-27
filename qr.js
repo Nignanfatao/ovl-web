@@ -14,7 +14,7 @@ const { toDataURL } = require('qrcode');
 const router = express.Router();
 
 // Chemin pour stocker les informations d'authentification
-const authInfoPath = path.join(__dirname, '../auth/qrcode.json');
+const authInfoPath = './auth';
 
 function removeFile(filePath) {
     if (!fs.existsSync(filePath)) return false;
