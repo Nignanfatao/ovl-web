@@ -11,7 +11,7 @@ const {
 } = require('@whiskeysockets/baileys');
 
 const router = express.Router();
-const authPath = path.join(__dirname, '../auth/creds.json');
+const authPath = path.join(__dirname, '../auth/creds');
 
 function removeFile(filePath) {
     if (!fs.existsSync(filePath)) return false;
