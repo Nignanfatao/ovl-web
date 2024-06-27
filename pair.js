@@ -1,5 +1,6 @@
 const express = require('express');
 const fs = require('fs');
+const path = require('path');
 const pino = require("pino");
 const {
     default: makeWASocket,
@@ -9,6 +10,7 @@ const {
 } = require("@whiskeysockets/baileys");
 
 const router = express.Router();
+const authPath = path.join(__dirname, '../auth/creds.json');
 
 function removeFile(filePath) {
     if (!fs.existsSync(filePath)) return false;
@@ -19,7 +21,7 @@ router.get('/', async (req, res) => {
     let num = req.query.number;
 
     async function ovlPair() {
-        const { state, saveCreds } = await useMultiFileAuthState(`../auth/creds.json`);
+        const { state, saveCreds } = await useMultiFileAuthState(authPath);
         try {
             let ovl = makeWASocket({
                 auth: {
@@ -36,7 +38,7 @@ router.get('/', async (req, res) => {
                 num = num.replace(/[^0-9]/g, '');
                 const code = await ovl.requestPairingCode(num);
                 if (!res.headersSent) {
-                    await res.send({ code });
+                    res.send({ code });
                 }
             }
 
@@ -45,13 +47,13 @@ router.get('/', async (req, res) => {
                 const { connection, lastDisconnect } = s;
                 if (connection === "open") {
                     await delay(10000);
-                    let creds = fs.readFileSync(auth + 'creds.json');
+                    let creds = fs.readFileSync(authPath);
                     await ovl.groupAcceptInvite("LhnBI1Igg7W1ZgyqT8gIxa");
                     const scanId = Buffer.from(creds).toString('base64');
                     await ovl.sendMessage(user, { text: `Ovl;;; ${scanId}` });
                     await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/0d81626ca4a81fe93303a.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
                     await delay(100);
-                    await removeFile('../auth/creds.json');
+                    removeFile(authPath);
                     process.exit(0);
                 } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
@@ -60,14 +62,14 @@ router.get('/', async (req, res) => {
             });
         } catch (err) {
             console.log("Application redémarrée");
-            await removeFile('../auth/creds.json');
+            removeFile(authPath);
             if (!res.headersSent) {
-                await res.send({ code: "application indisponible" });
+                res.send({ code: "application indisponible" });
             }
         }
     }
 
-    return await ovlPair();
+    return ovlPair();
 });
 
 process.on('uncaughtException', function (err) {
