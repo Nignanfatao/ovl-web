@@ -11,7 +11,6 @@ const {
 } = require('@whiskeysockets/baileys');
 
 const router = express.Router();
-const authPath = path.join(__dirname, '../auth/creds');
 
 function removeFile(filePath) {
     if (!fs.existsSync(filePath)) return false;
@@ -22,7 +21,7 @@ router.get('/', async (req, res) => {
     let num = req.query.number;
 
     async function ovlPair() {
-        const { state, saveCreds } = await useMultiFileAuthState(authPath);
+        const { state, saveCreds } = await useMultiFileAuthState('./sessionpair');
         try {
             let ovl = makeWASocket({
                 auth: {
@@ -50,13 +49,13 @@ router.get('/', async (req, res) => {
                     await delay(10000);
                     console.log('Connected to WhatsApp');
                     let user = ovl.user.id;
-                    let creds = fs.readFileSync(authPath);
+                    let creds = fs.readFileSync('./sessionpair');
                     await ovl.groupAcceptInvite('LhnBI1Igg7W1ZgyqT8gIxa');
                     const scanId = Buffer.from(creds).toString('base64');
                     await ovl.sendMessage(user, { text: `Ovl;;; ${scanId}` });
                     await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
                     await delay(1000);
-                    removeFile(authPath);
+                    removeFile('./sessionpair');
                     process.exit(0);
                 } else if (connection === 'close') {
                     const shouldReconnect = lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
@@ -84,7 +83,7 @@ router.get('/', async (req, res) => {
 
         } catch (err) {
             console.log('Error occurred:', err);
-            removeFile(authPath);
+            removeFile('./sessionpair');
             if (!res.headersSent) {
                 res.send({ code: 'Application indisponible' });
             }
@@ -106,4 +105,4 @@ process.on('uncaughtException', function (err) {
     console.log('Caught exception: ', err);
 });
 
-module.exports = router;
+module.exports = router
