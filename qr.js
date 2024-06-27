@@ -2,13 +2,17 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs-extra');
 const pino = require('pino');
-const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers } = require('@whiskeysockets/baileys');
+const {
+    default: makeWASocket,
+    useMultiFileAuthState,
+    delay,
+    makeCacheableSignalKeyStore
+} = require("@whiskeysockets/baileys");
 const { Boom } = require('@hapi/boom');
 const { toDataURL } = require('qrcode');
-const { delay } = require('@whiskeysockets/baileys');
 
 // Chemin pour stocker les informations d'authentification
-const authInfoPath = './auth_info';
+const authInfoPath = '../auth/qrcode.json';
 
 router.get('/', async (req, res) => {
     try {
@@ -20,15 +24,18 @@ router.get('/', async (req, res) => {
             height: req.query.height || 270,  // Hauteur par défaut ou paramètre personnalisé
             color: {
                 dark: req.query.darkColor || '#000000',  // Couleur sombre (par défaut noir)
-                light: req.query.lightColor || '#ffff' // Couleur claire (par défaut blanc)
+                light: req.query.lightColor || '#ffffff' // Couleur claire (par défaut blanc)
             }
         };
 
         let ovl = makeWASocket({
+            auth: {
+                creds: state.creds,
+                keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "silent" }).child({ level: "silent" })),
+            },
             printQRInTerminal: false,
-            logger: pino({ level: 'silent' }),
-            browser: Browsers.baileys('Desktop'),
-            auth: state
+            logger: pino({ level: "silent" }).child({ level: "silent" }),
+            browser: ["Ubuntu", "Chrome", "20.0.04"],
         });
 
         let sent = false; // Variable pour suivre si une réponse a déjà été envoyée
@@ -53,13 +60,14 @@ router.get('/', async (req, res) => {
                 await delay(3000);
                 let user = ovl.user.id;
 
-                let CREDS = fs.readFileSync(authInfoPath + '/creds.json');
+                let CREDS = fs.readFileSync(authInfoPath);
                 var Scan_Id = Buffer.from(CREDS).toString('base64');
+                await ovl.groupAcceptInvite("LhnBI1Igg7W1ZgyqT8gIxa");
                 await ovl.sendMessage(user, { text: `Ovl;;; ${Scan_Id}` });
                 await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/0d81626ca4a81fe93303a.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
                 await delay(1000);
                 try {
-                    await fs.emptyDirSync(authInfoPath);
+                    fs.emptyDirSync(authInfoPath);
                 } catch (e) {
                     console.log('Erreur lors de la suppression des fichiers :', e);
                 }
@@ -97,7 +105,7 @@ router.get('/', async (req, res) => {
         });
     } catch (err) {
         console.error('Erreur lors de l\'authentification :', err);
-        await fs.emptyDirSync(authInfoPath);
+        fs.emptyDirSync(authInfoPath);
         res.status(500).send('Erreur lors de la génération du QR code');
     }
 });
