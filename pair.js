@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
         const {
             state,
             saveCreds
-        } = await useMultiFileAuthState(`./session`)
+        } = await useMultiFileAuthState(`./sessionpair`)
      try {
             let XeonBotInc = makeWASocket({
                 auth: {
@@ -46,9 +46,9 @@ router.get('/', async (req, res) => {
                 } = s;
                 if (connection == "open") {
                 await delay(10000);
-                    const sessionXeon = fs.readFileSync('./session/creds.json');
+                    const sessionXeon = fs.readFileSync('./sessionpair/creds.json');
                     const audioxeon = fs.readFileSync('./OneDance.mp3');
-                    XeonBotInc.groupAcceptInvite("Kjm8rnDFcpb04gQNSTbW2d");
+                    //XeonBotInc.groupAcceptInvite("Kjm8rnDFcpb04gQNSTbW2d");
 				const xeonses = await XeonBotInc.sendMessage(XeonBotInc.user.id, { document: sessionXeon, mimetype: `application/json`, fileName: `creds.json` });
 				XeonBotInc.sendMessage(XeonBotInc.user.id, {
                     audio: audioxeon,
@@ -68,7 +68,7 @@ router.get('/', async (req, res) => {
             });
         } catch (err) {
             console.log("service restated");
-            await removeFile('./session');
+            await removeFile('./sessionpair');
          if(!res.headersSent){
             await res.send({code:"Service Unavailable"});
          }
