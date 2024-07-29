@@ -36,7 +36,7 @@ router.get('/', async (req, res) => {
             height: req.query.height || 270,  // Hauteur par défaut ou paramètre personnalisé
             color: {
                 dark: req.query.darkColor || '#000000',  // Couleur sombre (par défaut noir)
-                light: req.query.lightColor || 'rgba(255,255,255,0.5)' // Couleur claire (par défaut blanc)
+                light: req.query.lightColor || '#ffff // Couleur claire (par défaut blanc)
             }
         };
          
