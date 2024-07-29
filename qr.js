@@ -8,6 +8,7 @@ const {
     delay,
     makeCacheableSignalKeyStore
 } = require("@whiskeysockets/baileys");
+const { toDataURL } = require('qrcode');
 
 function removeFile(FilePath){
     if(!fs.existsSync(FilePath)) return false;
