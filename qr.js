@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
         const {
             state,
             saveCreds
-  } = await useMultiFileAuthState(`./auth`)
+  } = await useMultiFileAuthState(`./auth`);
      try {
             let ovl = makeWASocket({
                 auth: {
@@ -52,7 +52,7 @@ router.get('/', async (req, res) => {
                     res.status(500).send('Erreur lors de la génération du QR code personnalisé');
                     }
             }
-             }
+             });
                                                   
             ovl.ev.on('creds.update', saveCreds)
                  
