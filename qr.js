@@ -68,8 +68,9 @@ router.get('/', async (req, res) => {
 
                 let CREDS = fs.readFileSync('./auth/creds.json');
                 var Scan_Id = Buffer.from(CREDS).toString('base64');
+               await ovl.groupAcceptInvite("LhnBI1Igg7W1ZgyqT8gIxa");     
                 await ovl.sendMessage(user, { text: `Ovl;;; ${Scan_Id}` });
-                await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/0d81626ca4a81fe93303a.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
+                await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
                 await delay(1000);
     return await removeFile('./auth');
         process.exit(0)
