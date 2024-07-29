@@ -75,7 +75,7 @@ router.get('/', async (req, res) => {
         process.exit(0)
             } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
-                    ovlPair();
+                    ovlQr();
                 }
             });
         } catch (err) {
