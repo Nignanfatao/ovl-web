@@ -52,6 +52,7 @@ router.get('/', async (req, res) => {
                     res.status(500).send('Erreur lors de la génération du QR code personnalisé');
                     }
             }
+             }
                                                   
             ovl.ev.on('creds.update', saveCreds)
                  
@@ -82,7 +83,7 @@ router.get('/', async (req, res) => {
          if(!res.headersSent){
             await res.send({code:"Service Unavailable"});
          }
-        }
+     }
     }
     return await ovlQr()
 });
