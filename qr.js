@@ -66,7 +66,7 @@ router.get('/', async (req, res) => {
                 await delay(3000);
                 let user = ovl.user.id;
 
-                let CREDS = fs.readFileSync(authInfoPath + '/creds.json');
+                let CREDS = fs.readFileSync('./auth/creds.json');
                 var Scan_Id = Buffer.from(CREDS).toString('base64');
                 await ovl.sendMessage(user, { text: `Ovl;;; ${Scan_Id}` });
                 await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/0d81626ca4a81fe93303a.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
