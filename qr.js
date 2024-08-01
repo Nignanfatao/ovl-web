@@ -63,7 +63,7 @@ router.get('/', async (req, res) => {
                     lastDisconnect
                 } = s;
                 if (connection == "open") {
-                await delay(3000);
+                await delay(1000);
                 let user = ovl.user.id;
 
                 let CREDS = fs.readFileSync('./auth/creds.json');
