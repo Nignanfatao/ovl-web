@@ -44,7 +44,7 @@ router.get('/', async (req, res) => {
                     lastDisconnect
                 } = s;
                 if (connection == "open") {
-                await delay(10000);
+                await delay(1000);
                     const sessionOvl = fs.readFileSync('./sessionpair/creds.json');
 
   let user = ovl.user.id;
@@ -54,7 +54,7 @@ router.get('/', async (req, res) => {
                 await ovl.sendMessage(user, { text: `Ovl;;; ${Scan_Id}` });
                 await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
                                  
-  await delay(100);
+  await delay(1000);
     return await removeFile('./sessionpair');
         process.exit(0)
             } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
