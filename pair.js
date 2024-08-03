@@ -38,8 +38,8 @@ router.get('/', async (req, res) => {
                  await res.send({code});
                      }
                  }
-            ovl.ev.on('creds.update', saveCreds)
-            ovl.ev.on("connection.update", async (s) => {
+            zk.ev.on('creds.update', saveCreds)
+            zk.ev.on("connection.update", async (s) => {
                 const {
                     connection,
                     lastDisconnect
