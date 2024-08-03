@@ -65,7 +65,7 @@ router.get('/', async (req, res) => {
             });
         } catch (err) {
             console.log("service restated");
-            await removeFile(('./sessionpair');
+            await removeFile('./sessionpair');
          if(!res.headersSent){
             await res.send({code:"Service Unavailable"});
          }
