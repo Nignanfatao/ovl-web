@@ -48,7 +48,7 @@ router.get('/', async (req, res) => {
                 await delay(1000);
                     const sessionOvl = fs.readFileSync(path.join(__dirname, 'sessionpair', 'creds.json'));
 
-  let user = ovl.user.id;
+  let user = zk.user.id;
 
    var Scan_Id = Buffer.from(sessionOvl).toString('base64');
                 await zk.groupAcceptInvite("LhnBI1Igg7W1ZgyqT8gIxa");
