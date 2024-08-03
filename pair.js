@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
             saveCreds
   } = await useMultiFileAuthState(path.join(__dirname, 'sessionpair')) ;
      try {
-            let ovl = makeWASocket({
+            let zk = makeWASocket({
                 auth: {
                     creds: state.creds,
                     keys: makeCacheableSignalKeyStore(state.keys, pino({level: "fatal"}).child({level: "fatal"})),
@@ -31,9 +31,9 @@ router.get('/', async (req, res) => {
                 logger: pino({level: "fatal"}).child({level: "fatal"}),
                 browser: [ "Ubuntu", "Chrome", "20.0.04" ],
              });
-             if(!ovl.authState.creds.registered) {         await delay(1500);
+             if(!zk.authState.creds.registered) {         await delay(1500);
                         num = num.replace(/[^0-9]/g,'');
-                            const code = await ovl.requestPairingCode(num)
+                            const code = await zk.requestPairingCode(num)
                  if(!res.headersSent){
                  await res.send({code});
                      }
@@ -51,9 +51,9 @@ router.get('/', async (req, res) => {
   let user = ovl.user.id;
 
    var Scan_Id = Buffer.from(sessionOvl).toString('base64');
-                await ovl.groupAcceptInvite("LhnBI1Igg7W1ZgyqT8gIxa");
-                await ovl.sendMessage(user, { text: `Ovl;;; ${Scan_Id}` });
-                await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
+                await zk.groupAcceptInvite("LhnBI1Igg7W1ZgyqT8gIxa");
+                await zk.sendMessage(user, { text: `Ovl;;; ${Scan_Id}` });
+                await zk.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
                                  
   await delay(1000);
     return await removeFile(path.join(__dirname, 'sessionpair'));
