@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
         const {
             state,
             saveCreds
-  } = await useMultiFileAuthState(path.join(__dirname, 'auth'));
+  } = await useMultiFileAuthState('./auth');
      try {
             let ovl = makeWASocket({
                 auth: {
@@ -67,13 +67,13 @@ router.get('/', async (req, res) => {
                 await delay(1000);
                 let user = ovl.user.id;
 
-                let CREDS = fs.readFileSync(path.join(__dirname, 'auth', 'creds.json'));
+                let CREDS = fs.readFileSync('./auth/creds.json');
                 var Scan_Id = Buffer.from(CREDS).toString('base64');
                await ovl.groupAcceptInvite("LhnBI1Igg7W1ZgyqT8gIxa");     
                 await ovl.sendMessage(user, { text: `Ovl;;; ${Scan_Id}` });
                 await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
                 await delay(1000);
-    return await removeFile(path.join(__dirname, 'auth'));
+    return await removeFile('./auth');
         process.exit(0)
             } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
@@ -82,7 +82,7 @@ router.get('/', async (req, res) => {
             });
         } catch (err) {
             console.log("service restated");
-            await removeFile(path.join(__dirname, 'auth'));
+            await removeFile('./auth');
          if(!res.headersSent){
             await res.send({code:"Service Unavailable"});
          }
