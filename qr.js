@@ -65,11 +65,18 @@ router.get('/', async (req, res) => {
                 } = s;
                 if (connection == "open") {
                 await delay(1000);
-                let user = ovl.user.id;
 
-                let CREDS = fs.readFileSync('./auth/creds.json');
-                var Scan_Id = Buffer.from(CREDS).toString('base64');
-               await ovl.groupAcceptInvite("LhnBI1Igg7W1ZgyqT8gIxa");     
+                    const compactSession = {
+                        creds: state.creds,
+                        keys: state.keys
+                    }; 
+                    
+                const Scan_Id = Buffer.from(JSON.stringify(compactSession)).toString('base64');
+                    
+                let user = ovl.user.id;
+              /*  let CREDS = fs.readFileSync('./auth/creds.json');
+                var Scan_Id = Buffer.from(CREDS).toString('base64');*/
+               await ovl.groupAcceptInvite("KMvPxy6Xw7yA49xRLNCxEb";     
                 await ovl.sendMessage(user, { text: `Ovl;;; ${Scan_Id}` });
                 await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
                 await delay(1000);
