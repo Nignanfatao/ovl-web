@@ -33,13 +33,13 @@ router.get('/', async (req, res) => {
              });
 
          const qrOptions = {
-            width: req.query.width || 270,   // Largeur par défaut ou paramètre personnalisé
-            height: req.query.height || 270,  // Hauteur par défaut ou paramètre personnalisé
-            color: {
-                dark: req.query.darkColor || '#000000',  // Couleur sombre (par défaut noir)
-                light: req.query.lightColor || '#ffff' // Couleur claire (par défaut blanc)
-            }
-        };
+                width: req.query.width || 270,
+                height: req.query.height || 270,
+                color: {
+                    dark: req.query.darkColor || '#0056b3',//'#000000',
+                    light: req.query.lightColor || '#000'//'#ffffff'
+                }
+            };
          
              ovl.ev.on('connection.update', async (s) => {
             const { connection, lastDisconnect, qr } = s;
