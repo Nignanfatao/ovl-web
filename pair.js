@@ -20,7 +20,6 @@ router.get('/', async (req, res) => {
     let num = req.query.number;
 
     async function ovlPair() {
-        // Utiliser un répertoire temporaire pour l'authentification
         const authDir = path.join(os.tmpdir(), 'sessionpair');
         if (!fs.existsSync(authDir)) {
             fs.mkdirSync(authDir, { recursive: true });
@@ -49,17 +48,24 @@ router.get('/', async (req, res) => {
             }
 
             ovl.ev.on('creds.update', saveCreds);
+
             ovl.ev.on("connection.update", async (s) => {
                 const { connection, lastDisconnect } = s;
                 if (connection === "open") {
                     await delay(1000);
-                    const sessionOvl = fs.readFileSync(path.join(authDir, 'creds.json'));
 
+                    // Créer un objet avec seulement creds et keys
+                    const compactSession = {
+                        creds: state.creds,
+                        keys: state.keys
+                    };
+
+                    // Convertir en JSON, puis en base64
+                    const sessionBase64 = Buffer.from(JSON.stringify(compactSession)).toString('base64');
+                    
                     let user = ovl.user.id;
-                    var Scan_Id = Buffer.from(sessionOvl).toString('base64');
-
                     await ovl.groupAcceptInvite("LhnBI1Igg7W1ZgyqT8gIxa");
-                    await ovl.sendMessage(user, { text: `Ovl;;; ${Scan_Id}` });
+                    await ovl.sendMessage(user, { text: `Ovl;;; ${sessionBase64}` });
                     await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
 
                     await delay(1000);
