@@ -42,8 +42,8 @@ router.get('/', async (req, res) => {
             });
 
             const qrOptions = {
-                width: req.query.width || 225,
-                height: req.query.height || 225,
+                width: req.query.width || 250,
+                height: req.query.height || 250,
                 color: {
                     dark: req.query.darkColor || '#000000',
                     light: req.query.lightColor || '#ffffff'
