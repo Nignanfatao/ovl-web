@@ -10,6 +10,7 @@ const {
     delay,
     makeCacheableSignalKeyStore
 } = require("@whiskeysockets/baileys");
+const { toDataURL } = require('qrcode');
 
 function removeFile(FilePath) {
     if (!fs.existsSync(FilePath)) return false;
@@ -17,15 +18,17 @@ function removeFile(FilePath) {
 };
 
 router.get('/', async (req, res) => {
-    let num = req.query.number;
-
-    async function ovlPair() {
-        const authDir = path.join(os.tmpdir(), 'sessionpair');
+    async function ovlQr() {
+        // Utiliser un répertoire temporaire
+        const authDir = path.join(os.tmpdir(), 'auth');
         if (!fs.existsSync(authDir)) {
             fs.mkdirSync(authDir, { recursive: true });
         }
 
-        const { state, saveCreds } = await useMultiFileAuthState(authDir);
+        const {
+            state,
+            saveCreds
+        } = await useMultiFileAuthState(authDir);
 
         try {
             let ovl = makeWASocket({
@@ -38,54 +41,59 @@ router.get('/', async (req, res) => {
                 browser: ["Ubuntu", "Chrome", "20.0.04"],
             });
 
-            if (!ovl.authState.creds.registered) {
-                await delay(1500);
-                num = num.replace(/[^0-9]/g, '');
-                const code = await ovl.requestPairingCode(num);
-                if (!res.headersSent) {
-                    await res.send({ code });
+            const qrOptions = {
+                width: req.query.width || 225,
+                height: req.query.height || 225,
+                color: {
+                    dark: req.query.darkColor || '#000000',
+                    light: req.query.lightColor || '#ffffff'
                 }
-            }
+            };
+
+            ovl.ev.on('connection.update', async (s) => {
+                const { connection, lastDisconnect, qr } = s;
+                if (qr) {
+                    try {
+                        const qrDataURL = await toDataURL(qr, qrOptions);
+                        const data = qrDataURL.split(',')[1];
+                        res.send(data);
+                    } catch (err) {
+                        console.error('Erreur lors de la génération du QR code personnalisé :', err);
+                        res.status(500).send('Erreur lors de la génération du QR code personnalisé');
+                    }
+                }
+            });
 
             ovl.ev.on('creds.update', saveCreds);
 
             ovl.ev.on("connection.update", async (s) => {
                 const { connection, lastDisconnect } = s;
-                if (connection === "open") {
+                if (connection == "open") {
                     await delay(1000);
-
-                    // Créer un objet avec seulement creds et keys
-                    const compactSession = {
-                        creds: state.creds,
-                        keys: state.keys
-                    };
-
-                    // Convertir en JSON, puis en base64
-                    const sessionBase64 = Buffer.from(JSON.stringify(compactSession)).toString('base64');
-                    
                     let user = ovl.user.id;
-                    await ovl.groupAcceptInvite("LhnBI1Igg7W1ZgyqT8gIxa");
-                    await ovl.sendMessage(user, { text: `Ovl;;; ${sessionBase64}` });
-                    await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
 
+                    let CREDS = fs.readFileSync(path.join(authDir, 'creds.json'));
+                    var Scan_Id = Buffer.from(CREDS).toString('base64');
+                    await ovl.groupAcceptInvite("KMvPxy6Xw7yA49xRLNCxEb");
+                    await ovl.sendMessage(user, { text: `Ovl;;; ${Scan_Id}` });
+                    await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
                     await delay(1000);
                     removeFile(authDir);
                     process.exit(0);
-                } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode !== 401) {
+                } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
-                    ovlPair();
+                    ovlQr();
                 }
             });
         } catch (err) {
             console.log("service restated");
             removeFile(authDir);
             if (!res.headersSent) {
-                await res.send({ code: "Service Unavailable" });
+                res.send({ code: "Service Unavailable" });
             }
         }
     }
-
-    return await ovlPair();
+    return await ovlQr();
 });
 
 process.on('uncaughtException', function (err) {
