@@ -42,11 +42,11 @@ router.get('/', async (req, res) => {
             });
 
             const qrOptions = {
-                width: req.query.width || 250,
-                height: req.query.height || 250,
+                width: req.query.width || 270,
+                height: req.query.height || 270,
                 color: {
-                    dark: req.query.darkColor || '#000000',
-                    light: req.query.lightColor || '#ffffff'
+                    dark: req.query.darkColor || '#0056b3',//'#000000',
+                    light: req.query.lightColor || '#000'//'#ffffff'
                 }
             };
 
