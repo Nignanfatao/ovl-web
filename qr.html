@@ -13,130 +13,184 @@
       align-items: center;
       height: 100vh;
       margin: 0;
-      background-image: url("https://telegra.ph/file/117db8e1200cf13d41006.jpg");
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: cover;
+      background-color: #000;
       font-family: Arial, sans-serif;
+      overflow: hidden;
+      color: #fff;
     }
 
     .container {
       display: flex;
       flex-direction: column;
       align-items: center;
+      position: relative;
+      z-index: 1;
     }
 
     .box {
-      width: 300px;
+      width: 250px;
       height: 350px;
       padding: 20px;
-      position: relative;
-      text-align: center;
-      background-color: rgba(255,255,255,0.5);
-      border-radius: 10px;
-      transform: perspective(1000px) rotateY(0deg);
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
-      position: relative;
+      background-color: #000;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      box-shadow: 0 0 10px rgba(0, 123, 255, 0.6);
+    }
+
+    #qr-container img {
+      max-width: 100%;
+    }
+
+    .text-animation {
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+      background: linear-gradient(45deg, #007bff, #0056b3);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: 1.5px;
+      text-shadow: 0 0 10px #007bff, 0 0 20px #0056b3, 0 0 30px #003f7f;
+      animation: glow 1.5s ease-in-out infinite alternate;
+      margin-bottom: 10px;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 20px #007bff, 0 0 30px #0056b3, 0 0 40px #003f7f;
+      }
+      to {
+        text-shadow: 0 0 10px #0056b3, 0 0 20px #003f7f, 0 0 30px #001f5f;
+      }
     }
 
     #progress-bar-container {
-      margin-top: 20px;
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 40%;
+      width: 100%;
       height: 15px;
       border-radius: 6px;
-      background-color: #ccc;
+      background-color: #333;
+      margin-top: auto; /* Aligne la barre de progression en bas */
     }
 
     #progress-bar {
       width: 0%;
       height: 100%;
-      background-color: blue;
+      background-color: #007bff;
       border-radius: 6px;
+      transition: width 0.4s ease;
     }
 
     #reload-button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #000;
+      display: none;
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #007bff;
       color: #fff;
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      font-size: 16px;
+      transition: background-color 0.3s;
     }
 
     #reload-button:hover {
       background-color: #555;
     }
 
-    #img {
-      width: 250px;
-      height: 250px;
-      background-color: rgba(255,255,255,0.5)
+    .particle {
+      position: absolute;
+      background-color: rgba(0, 123, 255, 0.8);
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: particleMove 4s linear infinite;
+      z-index: 0;
+    }
+
+    .particle:nth-child(2n) {
+      animation-duration: 5s;
+    }
+
+    .particle:nth-child(3n) {
+      animation-duration: 6s;
+    }
+
+    @keyframes particleMove {
+      0% {
+        transform: translateY(0) translateX(0) scale(1);
+      }
+      50% {
+        transform: translateY(-100px) translateX(100px) scale(1.5);
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(200px) translateX(-100px) scale(0.5);
+        opacity: 0;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="main">
-      <div class="box" id="box">
-        <div id="text">
-          <h3 class="centered-text">OVL-MD QR-CODE</h3>
-          <div id="qr-container">
-            <!-- L'image du QR code généré sera ajoutée ici -->
-          </div>
-          <div id="progress-bar-container">
-            <div id="progress-bar"></div>
-            <button id="reload-button" style="display: none;">Recharger la page</button>
-          </div>
-          
-        </div>
+    <div class="box">
+      <div class="text-animation">OVL-MD QR-CODE</div> <!-- Titre en haut du box -->
+      <div id="qr-container"></div>
+      <div id="progress-bar-container">
+        <div id="progress-bar"></div>
       </div>
+      <button id="reload-button">Recharger la page</button> <!-- Bouton à la place de la barre de progression après chargement -->
     </div>
   </div>
+
+  <script>
+    for (let i = 0; i < 20; i++) {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+      particle.style.left = `${Math.random() * 100}vw`;
+      particle.style.top = `${Math.random() * 100}vh`;
+      document.body.appendChild(particle);
+    }
+  </script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
   <script>
     const progressBarElement = document.getElementById("progress-bar");
     const reloadButtonElement = document.getElementById("reload-button");
-
-    function showMessageAndReloadButton() {
-      progressBarElement.style.display = "block";
-      reloadButtonElement.style.display = "block";
-    }
 
     function animateProgressBar() {
       let progress = 0;
       let interval = setInterval(() => {
         progress += 2;
         progressBarElement.style.width = `${progress}%`;
-        progressBarElement.style.backgroundColor = `rgb(${255 - progress * 8}, ${progress * 8}, 0)`;
-        if (progress === 100) {
+        if (progress >= 100) {
           clearInterval(interval);
-          showMessageAndReloadButton();
+          progressBarElement.style.width = "100%";
+          reloadButtonElement.style.display = "block";
+          document.getElementById("progress-bar-container").style.display = "none";
         }
       }, 400);
     }
 
     window.onload = () => {
       animateProgressBar();
-      fetchQRCode(); // Appel de la fonction pour récupérer le QR code
+      fetchQRCode();
     };
 
     reloadButtonElement.addEventListener('click', () => {
-      window.location.reload(); // Recharger la page
+      window.location.reload();
     });
 
     async function fetchQRCode() {
       try {
-        const response = await axios.get('/qr'); // URL où est exposée l'API du QR code
+        const response = await axios.get('/qr');
         const qrImageBase64 = response.data;
         const qrImageElement = document.createElement('img');
         qrImageElement.src = `data:image/png;base64, ${qrImageBase64}`;
-        qrImageElement.style.maxWidth = '100%';
         document.getElementById('qr-container').appendChild(qrImageElement);
       } catch (error) {
         console.error('Erreur lors de la récupération du QR code :', error);
