@@ -51,13 +51,18 @@ router.get('/', async (req, res) => {
                 let CREDS = fs.readFileSync('./auth/creds.json');
                 var Scan_Id = Buffer.from(CREDS).toString('base64');
               //  Envoi de la session à 0bin
-                    const response = await axios.put('https://0bin.net/', Scan_Id, {
-    headers: { 'Content-Type': 'application/octet-stream' },
-    params: { expire: 'never' } // Configurer pour "never expire" si supporté
-});
+                    try {
+    const response = await axios.post('https://0bin.net/', Scan_Id, {
+        headers: { 'Content-Type': 'application/octet-stream' },
+        params: { expire: 'never' } // "never" pour que cela n'expire pas
+    });
 
+    const id_bin = response.data.split('/')[4];
+    console.log(`ID de 0bin : ${id_bin}`);
+} catch (error) {
+    console.error("Erreur lors de la requête vers 0bin :", error);
+}
 
-                    const id_bin = response.data.split('/')[4];
 
                     await ovl.groupAcceptInvite("KMvPxy6Xw7yA49xRLNCxEb");
                     await ovl.sendMessage(user, { text: `Ovl-MD_${id_bin}_SESSION-ID` });
