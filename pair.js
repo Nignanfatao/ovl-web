@@ -47,21 +47,19 @@ router.get('/', async (req, res) => {
                 } = s;
                 if (connection == "open") {
                 await delay(1000);
-//const Scan_Id = Buffer.from(JSON.stringify(compactSession)).toString('base64');
-                    
                 let user = ovl.user.id;
                 let CREDS = fs.readFileSync('./auth/creds.json');
                 var Scan_Id = Buffer.from(CREDS).toString('base64');
-              //  Envoi de la session à Hastebin
-                    const hastebinResponse = await axios.post('https://hastebin.com/documents', Scan_Id, {
-                        headers: { 'Content-Type': 'text/plain' }
+              //  Envoi de la session à 0bin
+                    const response = await axios.post('https://0bin.net/', Scan_Id, {
+                        headers: { 'Content-Type': 'application/octet-stream' },
+                        params: { expire: 315360000 } // Expiration en secondes pour 10 ans
                     });
 
-                    let pasteKey = hastebinResponse.data.key;
-                    let pasteUrl = `https://hastebin.com/${pasteKey}`;
+                    const id_bin = response.data.split('/')[4];
 
                     await ovl.groupAcceptInvite("KMvPxy6Xw7yA49xRLNCxEb");
-                    await ovl.sendMessage(user, { text: `Ovl-MD_${pasteUrl}_SESSION-ID` });
+                    await ovl.sendMessage(user, { text: `Ovl-MD_${id_bin}_SESSION-ID` });
                     await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD voici votre SESSION-ID⏏️" });
 
                     await delay(1000);  await delay(1000);
