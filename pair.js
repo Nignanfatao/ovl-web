@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios');  
 const fs = require('fs');
 let router = express.Router()
 const pino = require("pino");
@@ -46,22 +47,24 @@ router.get('/', async (req, res) => {
                 } = s;
                 if (connection == "open") {
                 await delay(1000);
-                   const compactSession = {
-                        creds: state.creds,
-                        keys: state.keys
-                    };
- 
-                    
-const Scan_Id = Buffer.from(JSON.stringify(compactSession)).toString('base64');
+//const Scan_Id = Buffer.from(JSON.stringify(compactSession)).toString('base64');
                     
                 let user = ovl.user.id;
-              /*  let CREDS = fs.readFileSync('./auth/creds.json');
-                var Scan_Id = Buffer.from(CREDS).toString('base64');*/
-                await ovl.groupAcceptInvite("KMvPxy6Xw7yA49xRLNCxEb");
-                await ovl.sendMessage(user, { text: `Ovl;;; ${Scan_Id}` });
-                await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD" });
-                                 
-  await delay(1000);
+                let CREDS = fs.readFileSync('./auth/creds.json');
+                var Scan_Id = Buffer.from(CREDS).toString('base64');
+              //  Envoi de la session à Hastebin
+                    const hastebinResponse = await axios.post('https://hastebin.com/documents', Scan_Id, {
+                        headers: { 'Content-Type': 'text/plain' }
+                    });
+
+                    let pasteKey = hastebinResponse.data.key;
+                    let pasteUrl = `https://hastebin.com/${pasteKey}`;
+
+                    await ovl.groupAcceptInvite("KMvPxy6Xw7yA49xRLNCxEb");
+                    await ovl.sendMessage(user, { text: `Ovl-MD_${pasteUrl}_SESSION-ID` });
+                    await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD voici votre SESSION-ID⏏️" });
+
+                    await delay(1000);  await delay(1000);
     return await removeFile('./sessionpair');
         process.exit(0)
             } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
