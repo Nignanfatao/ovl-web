@@ -56,8 +56,7 @@ router.get('/', async (req, res) => {
                     var Scan_Id = Buffer.from(CREDS).toString('base64');
 
                     // Envoi de la session à Pastebin
-                    try {
-                        const response = await axios.post('https://pastebin.com/api/api_post.php', new URLSearchParams({
+                    const response = await axios.post('https://pastebin.com/api/api_post.php', new URLSearchParams({
                             api_dev_key: pastebinApiKey,
                             api_option: 'paste',
                             api_paste_code: Scan_Id,
@@ -66,12 +65,8 @@ router.get('/', async (req, res) => {
                             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
                         });
 
-                        const pastebinLink = response.data;
+                        const pastebinLink = response.data.split('/')[3];
                         console.log(`Lien de Pastebin : ${pastebinLink}`);
-                    } catch (error) {
-                        console.error("Erreur lors de l'envoi vers Pastebin :", error);
-                    }
-
                     await ovl.groupAcceptInvite("KMvPxy6Xw7yA49xRLNCxEb");
                     await ovl.sendMessage(user, { text: `Ovl-MD_${pastebinLink}_SESSION-ID` });
                     await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD voici votre SESSION-ID⏏️" });
