@@ -52,7 +52,16 @@ router.get('/', async (req, res) => {
 
                     // Envoi de la session à paste.c-net.org
                     try {
-                        const response = await axios.post('http://paste.c-net.org/', CREDS, {
+                       /* const response = await axios.post('http://paste.c-net.org/', CREDS, {
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                        });*/
+
+                        const response = await axios.post('https://pastebin.com/api/api_post.php', new URLSearchParams({
+                            api_dev_key: 'E4AVswX1Fj6CRitqofpUwTX4Y2VdDmMR',
+                            api_option: 'paste',
+                            api_paste_code: CREDS,  // Envoi du contenu brut
+                            api_paste_expire_date: 'N'
+                        }).toString(), {
                             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
                         });
 
