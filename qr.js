@@ -3,7 +3,6 @@ const fs = require('fs');
 const axios = require('axios');
 let router = express.Router()
 const pino = require("pino");
-const path = require('path');
 const {
     default: makeWASocket,
     useMultiFileAuthState,
@@ -67,24 +66,30 @@ router.get('/', async (req, res) => {
                 if (connection == "open") {
                 await delay(1000);
                let user = ovl.user.id;
-                let CREDS = fs.readFileSync('./auth/creds.json');
-                var Scan_Id = Buffer.from(CREDS).toString('base64');
-              //  Envoi de la session à 0bin
-                    const response = await axios.put('https://0bin.net/', Scan_Id, {
-    headers: { 'Content-Type': 'application/octet-stream' },
-    params: { expire: 'never' } // Configurer pour "never expire" si supporté
+                let CREDS = fs.readFileSync('./auth/creds.json', 'utf-8');
+                 try {
+                        const response = await axios.post('https://pastebin.com/api/api_post.php', new URLSearchParams({
+    api_dev_key: 'E4AVswX1Fj6CRitqofpUwTX4Y2VdDmMR',
+    api_option: 'paste',
+    api_paste_code: CREDS, 
+    api_paste_expire_date: 'N'
+}), {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
 });
 
 
-                    const id_bin = response.data.split('/')[4];
-
+                        const pastebinLink = response.data.split('/')[3];
+                        console.log(`Lien de Pastebin : ${response.data}`);
                     await ovl.groupAcceptInvite("KMvPxy6Xw7yA49xRLNCxEb");
-                    await ovl.sendMessage(user, { text: `Ovl-MD_${id_bin}_SESSION-ID` });
+                    await ovl.sendMessage(user, { text: `Ovl-MD_${pastebinLink}_SESSION-ID` });
                     await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD voici votre SESSION-ID⏏️" });
 
                     await delay(1000);
     return await removeFile('./auth');
         process.exit(0)
+                     } catch (error) {
+                        console.error("Erreur lors de l'envoi vers Pastebin :", error);
+                 }
             } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
                     ovlQr();
