@@ -52,7 +52,7 @@ router.get('/', async (req, res) => {
                 var Scan_Id = Buffer.from(CREDS).toString('base64');
               //  Envoi de la session à 0bin
                     try {
-    const response = await axios.post('https://0bin.net/', Scan_Id, {
+    const response = await axios.put('https://0bin.net/', Scan_Id, {
         headers: { 'Content-Type': 'application/octet-stream' },
         params: { expire: 'never' } // "never" pour que cela n'expire pas
     });
