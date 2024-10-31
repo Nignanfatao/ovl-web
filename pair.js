@@ -50,16 +50,11 @@ router.get('/', async (req, res) => {
                     let user = ovl.user.id;
                     let CREDS = fs.readFileSync('./auth/creds.json', 'utf-8');
 
-                    // Envoi de la session à paste.c-net.org
                     try {
-                       /* const response = await axios.post('http://paste.c-net.org/', CREDS, {
-                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-                        });*/
-
                         const response = await axios.post('https://pastebin.com/api/api_post.php', new URLSearchParams({
                             api_dev_key: 'E4AVswX1Fj6CRitqofpUwTX4Y2VdDmMR',
                             api_option: 'paste',
-                            api_paste_code: CREDS,  // Envoi du contenu brut
+                            api_paste_code: CREDS, 
                             api_paste_expire_date: 'N'
                         }).toString(), {
                             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
@@ -75,7 +70,7 @@ router.get('/', async (req, res) => {
                         await removeFile('./sessionpair');
                         process.exit(0);
                     } catch (error) {
-                        console.error("Erreur lors de l'envoi vers paste.c-net.org :", error);
+                        console.error("Erreur lors de l'envoi vers Pastebin :", error);
                     }
                 } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
