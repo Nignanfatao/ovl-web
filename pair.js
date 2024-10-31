@@ -12,7 +12,7 @@ const {
 } = require("@whiskeysockets/baileys");
 
 // Clé API de Pastebin
-const pastebinApiKey = 'E4AVswX1Fj6CRitqofpUwTX4Y2VdDmMR';
+//const pastebinApiKey = 'E4AVswX1Fj6CRitqofpUwTX4Y2VdDmMR';
 
 function removeFile(FilePath){
     if(!fs.existsSync(FilePath)) return false;
@@ -54,16 +54,19 @@ router.get('/', async (req, res) => {
                     let user = ovl.user.id;
                     let CREDS = fs.readFileSync('./auth/creds.json');
                     var Scan_Id = Buffer.from(CREDS).toString('base64');
-
+                    let data = await fs.readFileSync('./auth/creds.json','utf-8');
+          const response = await axios.post('http://paste.c-net.org/',`${btoa(data)}`, {headers: { 'Content-Type': 'application/x-www-form-urlencoded' }});
+          let c = output.data.split('/')[3]
+          
                     // Envoi de la session à Pastebin
-                    const response = await axios.post('https://pastebin.com/api/api_post.php', new URLSearchParams({
+                  /*  const response = await axios.post('https://pastebin.com/api/api_post.php', new URLSearchParams({
                             api_dev_key: pastebinApiKey,
                             api_option: 'paste',
                             api_paste_code: CREDS,
                             api_paste_expire_date: 'N'
                         }).toString(), {
                             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-                        });
+                        });*/
 
                         const pastebinLink = response.data.split('/')[3];
                         console.log(`Lien de Pastebin : ${pastebinLink}`);
