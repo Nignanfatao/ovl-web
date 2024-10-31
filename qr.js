@@ -1,8 +1,8 @@
 const express = require('express');
 const fs = require('fs');
 const axios = require('axios');
-let router = express.Router()
 const pino = require("pino");
+let router = express.Router();
 const {
     default: makeWASocket,
     useMultiFileAuthState,
@@ -11,15 +11,17 @@ const {
 } = require("@whiskeysockets/baileys");
 const { toDataURL } = require('qrcode');
 
-function removeFile(FilePath){
-    if(!fs.existsSync(FilePath)) return false;
-    fs.rmSync(FilePath, { recursive: true, force: true })
- };
+function removeFile(FilePath) {
+    if (!fs.existsSync(FilePath)) return false;
+    fs.rmSync(FilePath, { recursive: true, force: true });
+};
 
 router.get('/', async (req, res) => {
     async function ovlQr() {
-        const { state, saveCreds } = await useMultiFileAuthState('./auth');
-        let responseSent = false; // Indicateur pour vérifier si la réponse a déjà été envoyée
+        const {
+            state,
+            saveCreds
+        } = await useMultiFileAuthState('./auth');
 
         try {
             let ovl = makeWASocket({
@@ -36,25 +38,21 @@ router.get('/', async (req, res) => {
                 width: req.query.width || 270,
                 height: req.query.height || 270,
                 color: {
-                    dark: req.query.darkColor || '#0056b3',
-                    light: req.query.lightColor || '#000',
+                    dark: req.query.darkColor || '#0056b3',//'#000000',
+                    light: req.query.lightColor || '#000'//'#ffffff'
                 }
             };
 
             ovl.ev.on('connection.update', async (s) => {
                 const { connection, lastDisconnect, qr } = s;
-                if (qr && !responseSent) {
+                if (qr) {
                     try {
                         const qrDataURL = await toDataURL(qr, qrOptions);
-                        const data = qrDataURL.split(',')[1]; // Envoyer seulement la partie base64 de l'URL
+                        const data = qrDataURL.split(',')[1];
                         res.send(data);
-                        responseSent = true; // Marquer la réponse comme envoyée
                     } catch (err) {
                         console.error('Erreur lors de la génération du QR code personnalisé :', err);
-                        if (!responseSent) {
-                            res.status(500).send('Erreur lors de la génération du QR code personnalisé');
-                            responseSent = true; // Marquer la réponse comme envoyée
-                        }
+                        res.status(500).send('Erreur lors de la génération du QR code personnalisé');
                     }
                 }
             });
@@ -63,7 +61,7 @@ router.get('/', async (req, res) => {
 
             ovl.ev.on("connection.update", async (s) => {
                 const { connection, lastDisconnect } = s;
-                if (connection === "open") {
+                if (connection == "open") {
                     await delay(1000);
                     let user = ovl.user.id;
                     let CREDS = fs.readFileSync('./auth/creds.json', 'utf-8');
@@ -96,9 +94,9 @@ router.get('/', async (req, res) => {
             });
         } catch (err) {
             console.log("service restated");
-            await removeFile('./auth');
+            removeFile('./auth');
             if (!res.headersSent) {
-                await res.send({ code: "Service Unavailable" });
+                res.send({ code: "Service Unavailable" });
             }
         }
     }
@@ -106,15 +104,15 @@ router.get('/', async (req, res) => {
 });
 
 process.on('uncaughtException', function (err) {
-let e = String(err)
-if (e.includes("conflict")) return
-if (e.includes("Socket connection timeout")) return
-if (e.includes("not-authorized")) return
-if (e.includes("rate-overlimit")) return
-if (e.includes("Connection Closed")) return
-if (e.includes("Timed Out")) return
-if (e.includes("Value not found")) return
-console.log('Caught exception: ', err)
-})
+    let e = String(err);
+    if (e.includes("conflict")) return;
+    if (e.includes("Socket connection timeout")) return;
+    if (e.includes("not-authorized")) return;
+    if (e.includes("rate-overlimit")) return;
+    if (e.includes("Connection Closed")) return;
+    if (e.includes("Timed Out")) return;
+    if (e.includes("Value not found")) return;
+    console.log('Caught exception: ', err);
+});
 
-module.exports = router
+module.exports = router;
