@@ -51,10 +51,11 @@ router.get('/', async (req, res) => {
                 let CREDS = fs.readFileSync('./auth/creds.json');
                 var Scan_Id = Buffer.from(CREDS).toString('base64');
               //  Envoi de la session à 0bin
-                    const response = await axios.post('https://0bin.net/', Scan_Id, {
-                        headers: { 'Content-Type': 'application/octet-stream' },
-                        params: { expire: 315360000 } // Expiration en secondes pour 10 ans
-                    });
+                    const response = await axios.put('https://0bin.net/', Scan_Id, {
+    headers: { 'Content-Type': 'application/octet-stream' },
+    params: { expire: 'never' } // Configurer pour "never expire" si supporté
+});
+
 
                     const id_bin = response.data.split('/')[4];
 
