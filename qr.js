@@ -49,7 +49,10 @@ router.get('/', async (req, res) => {
                     try {
                         const qrDataURL = await toDataURL(qr, qrOptions);
                         const data = qrDataURL.split(',')[1];
-                        res.send(data);
+                        if (!res.headersSent) {
+                    await res.send(data);
+                        }
+                      //  res.send(data);
                     } catch (err) {
                         console.error('Erreur lors de la génération du QR code personnalisé :', err);
                         res.status(500).send('Erreur lors de la génération du QR code personnalisé');
