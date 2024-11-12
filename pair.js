@@ -1,4 +1,6 @@
 const express = require('express');
+const NodeCache = require('node-cache');
+const msgRetryCounterCache = new NodeCache();
 const axios = require('axios');  
 const fs = require('fs');
 let router = express.Router();
@@ -30,6 +32,7 @@ router.get('/', async (req, res) => {
                 printQRInTerminal: false,
                 logger: pino({ level: "fatal" }).child({ level: "fatal" }),
                 browser: [ "Ubuntu", "Chrome", "20.0.04" ],
+                msgRetryCounterCache
             });
 
             if (!ovl.authState.creds.registered) {
