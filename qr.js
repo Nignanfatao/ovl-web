@@ -1,109 +1,93 @@
 const express = require('express');
+const axios = require('axios');  
 const fs = require('fs');
-const axios = require('axios');
-const pino = require("pino");
 let router = express.Router();
+const pino = require("pino");
 const {
     default: makeWASocket,
     useMultiFileAuthState,
     delay,
     makeCacheableSignalKeyStore
 } = require("@whiskeysockets/baileys");
-const { toDataURL } = require('qrcode');
 
-function removeFile(FilePath) {
-    if (!fs.existsSync(FilePath)) return false;
+function removeFile(FilePath){
+    if(!fs.existsSync(FilePath)) return false;
     fs.rmSync(FilePath, { recursive: true, force: true });
-};
+}
 
 router.get('/', async (req, res) => {
-    async function ovlQr() {
-        const {
-            state,
-            saveCreds
-        } = await useMultiFileAuthState('./auth');
-
+    let num = req.query.number;
+    
+    async function ovlPair() {
+        const { state, saveCreds } = await useMultiFileAuthState('./sessionpair');
+        
         try {
             let ovl = makeWASocket({
                 auth: {
                     creds: state.creds,
-                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
+                    keys: makeCacheableSignalKeyStore(state.keys, pino({level: "fatal"}).child({level: "fatal"})),
                 },
                 printQRInTerminal: false,
-                logger: pino({ level: "fatal" }).child({ level: "fatal" }),
-                browser: ["Ubuntu", "Chrome", "20.0.04"],
+                logger: pino({level: "fatal"}).child({level: "fatal"}),
+                browser: [ "Ubuntu", "Chrome", "20.0.04" ],
             });
 
-            const qrOptions = {
-                width: req.query.width || 270,
-                height: req.query.height || 270,
-                color: {
-                    dark: req.query.darkColor || '#0056b3',//'#000000',
-                    light: req.query.lightColor || '#000'//'#ffffff'
+            if (!ovl.authState.creds.registered) {
+                await delay(1500);
+                num = num.replace(/[^0-9]/g,'');
+                const code = await ovl.requestPairingCode(num);
+                if (!res.headersSent) {
+                    await res.send({ code });
                 }
-            };
-
-            ovl.ev.on('connection.update', async (s) => {
-                const { connection, lastDisconnect, qr } = s;
-                if (qr) {
-                    try {
-                        const qrDataURL = await toDataURL(qr, qrOptions);
-                        const data = qrDataURL.split(',')[1];
-                        if (!res.headersSent) {
-                    await res.send(data);
-                        }
-                      //  res.send(data);
-                    } catch (err) {
-                        console.error('Erreur lors de la génération du QR code personnalisé :', err);
-                        res.status(500).send('Erreur lors de la génération du QR code personnalisé');
-                    }
-                }
-            });
+            }
 
             ovl.ev.on('creds.update', saveCreds);
-
             ovl.ev.on("connection.update", async (s) => {
                 const { connection, lastDisconnect } = s;
+                
                 if (connection == "open") {
                     await delay(1000);
                     let user = ovl.user.id;
-                    let CREDS = fs.readFileSync('./auth/creds.json', 'utf-8');
+                    let CREDS = fs.readFileSync('./sessionpair/creds.json', 'utf-8');
+
                     try {
                         const response = await axios.post('https://pastebin.com/api/api_post.php', new URLSearchParams({
-                            api_dev_key: 'E4AVswX1Fj6CRitqofpUwTX4Y2VdDmMR',
-                            api_option: 'paste',
-                            api_paste_code: CREDS,
-                            api_paste_expire_date: 'N'
-                        }), {
-                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-                        });
+    api_dev_key: 'E4AVswX1Fj6CRitqofpUwTX4Y2VdDmMR',
+    api_option: 'paste',
+    api_paste_code: CREDS, 
+    api_paste_expire_date: 'N'
+}), {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+});
+
 
                         const pastebinLink = response.data.split('/')[3];
                         console.log(`Lien de Pastebin : ${response.data}`);
                         await ovl.groupAcceptInvite("KMvPxy6Xw7yA49xRLNCxEb");
                         await ovl.sendMessage(user, { text: `Ovl-MD_${pastebinLink}_SESSION-ID` });
                         await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD voici votre SESSION-ID⏏️" });
-
-                        await delay(1000);
-                        await removeFile('./auth');
+                        
+                        await delay(1000);  
+                        await removeFile('./sessionpair');
                         process.exit(0);
                     } catch (error) {
                         console.error("Erreur lors de l'envoi vers Pastebin :", error);
                     }
                 } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
-                    ovlQr();
+                    ovlPair();
                 }
             });
         } catch (err) {
-            console.log("service restated");
-            removeFile('./auth');
+            console.log("Service redémarré");
+            await removeFile('./sessionpair');
             if (!res.headersSent) {
-                res.send({ code: "Service Unavailable" });
+                await res.send({ code: "Service Unavailable" });
             }
         }
     }
-    return await ovlQr();
+
+    return await ovlPair();
 });
 
 process.on('uncaughtException', function (err) {
