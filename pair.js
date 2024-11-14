@@ -1,6 +1,4 @@
 const express = require('express');
-const NodeCache = require('node-cache');
-const msgRetryCounterCache = new NodeCache();
 const axios = require('axios');  
 const fs = require('fs');
 let router = express.Router();
@@ -27,12 +25,11 @@ router.get('/', async (req, res) => {
             let ovl = makeWASocket({
                 auth: {
                     creds: state.creds,
-                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
+                    keys: makeCacheableSignalKeyStore(state.keys, pino({level: "fatal"}).child({level: "fatal"})),
                 },
                 printQRInTerminal: false,
-                logger: pino({ level: "fatal" }).child({ level: "fatal" }),
+                logger: pino({level: "fatal"}).child({level: "fatal"}),
                 browser: [ "Ubuntu", "Chrome", "20.0.04" ],
-                msgRetryCounterCache
             });
 
             if (!ovl.authState.creds.registered) {
@@ -55,13 +52,14 @@ router.get('/', async (req, res) => {
 
                     try {
                         const response = await axios.post('https://pastebin.com/api/api_post.php', new URLSearchParams({
-                            api_dev_key: 'E4AVswX1Fj6CRitqofpUwTX4Y2VdDmMR',
-                            api_option: 'paste',
-                            api_paste_code: CREDS, 
-                            api_paste_expire_date: 'N'
-                        }), {
-                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-                        });
+    api_dev_key: 'E4AVswX1Fj6CRitqofpUwTX4Y2VdDmMR',
+    api_option: 'paste',
+    api_paste_code: CREDS, 
+    api_paste_expire_date: 'N'
+}), {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+});
+
 
                         const pastebinLink = response.data.split('/')[3];
                         console.log(`Lien de Pastebin : ${response.data}`);
@@ -70,15 +68,12 @@ router.get('/', async (req, res) => {
                         await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD voici votre SESSION-ID⏏️" });
                         
                         await delay(1000);  
-                        await ovl.flushBuffer(); // Vider le buffer avant de fermer le processus
-                        removeFile('./sessionpair');
+                        await removeFile('./sessionpair');
                         process.exit(0);
                     } catch (error) {
                         console.error("Erreur lors de l'envoi vers Pastebin :", error);
                     }
-                } else if (connection === "close" && lastDisconnect?.error?.output?.statusCode !== 401) {
-                    console.log("Reconnexion dans 10 secondes...");
-                    await ovl.flushBuffer(); // Vider le buffer avant de tenter une reconnexion
+                } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
                     ovlPair();
                 }
