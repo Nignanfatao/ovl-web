@@ -23,12 +23,12 @@ router.get('/', async (req, res) => {
         
         try {
             let ovl = makeWASocket({
-                auth: {
+                auth: state, /*{
                     creds: state.creds,
                     keys: makeCacheableSignalKeyStore(state.keys, pino({level: "fatal"}).child({level: "fatal"})),
-                },
+                },*/
                 printQRInTerminal: false,
-                logger: pino({level: "fatal"}).child({level: "fatal"}),
+                logger: pino({level: "silent"}).child({level: "silent"}),
                 browser: [ "Ubuntu", "Chrome", "20.0.04" ],
             });
 
@@ -103,3 +103,18 @@ process.on('uncaughtException', function (err) {
 });
 
 module.exports = router;
+
+
+/*const { default: IzukuWASocket, useMultiFileAuthState, Browsers, delay,DisconnectReason, makeInMemoryStore, } = require("@whiskeysockets/baileys");
+  const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) })
+  async function IZUKU() {
+    const { state, saveCreds } = await useMultiFileAuthState(__dirname + '/auth_info_baileys')
+    try {
+        let cnd =IzukuWASocket({ 
+        printQRInTerminal: false,
+        logger: pino({ level: "silent" }), 
+        browser: Browsers.macOS("Desktop"),
+        auth: state 
+        });
+*/
+
