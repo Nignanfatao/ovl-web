@@ -29,10 +29,10 @@ router.get('/', async (req, res) => {
             let ovl = makeWASocket({
                 auth: {
                     creds: state.creds,
-                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
+                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "silent" }).child({ level: "silent" })),
                 },
                 printQRInTerminal: false,
-                logger: pino({ level: "fatal" }).child({ level: "fatal" }),
+                logger: pino({ level: "silent" }).child({ level: "silent" }),
                 browser: ["Ubuntu", "Chrome", "20.0.04"],
             });
 
