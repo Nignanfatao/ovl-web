@@ -7,10 +7,9 @@ const {
     default: makeWASocket,
     useMultiFileAuthState,
     delay,
-    makeCacheableSignalKeyStore,
-    jidNormalizedUser
+    makeCacheableSignalKeyStore,    
+    fetchLatestBaileysVersion
 } = require("@whiskeysockets/baileys");
-const msgRetryCounterCache = new NodeCache();
 function removeFile(FilePath){
     if(!fs.existsSync(FilePath)) return false;
     fs.rmSync(FilePath, { recursive: true, force: true });
@@ -20,6 +19,8 @@ router.get('/', async (req, res) => {
     let num = req.query.number;
     
     async function ovlPair() {
+    const { version, isLatest } = await fetchLatestBaileysVersion();
+   
         const { state, saveCreds } = await useMultiFileAuthState('./sessionpair');
         
         try {
@@ -31,15 +32,16 @@ router.get('/', async (req, res) => {
                 printQRInTerminal: false,
                 logger: pino({level: "silent"}).child({level: "silent"}),
                 browser: ['OVL-MD', "chrome", "1.0.0"],
-                getMessage: async (key) => {
-         let jid = jidNormalizedUser(key.remoteJid)
-         let msg = await store.loadMessage(jid, key.id)
-
-         return msg?.message || ""
-      },
-                msgRetryCounterCache
-            });
-
+                version,
+                logger: pino({ level: "silent" }),
+                fireInitQueries: false,
+                shouldSyncHistoryMessage: true,
+                downloadHistory: true,
+                syncFullHistory: true,
+                generateHighQualityLinkPreview: true,
+                markOnlineOnConnect: false,
+             });
+ 
             if (!ovl.authState.creds.registered) {
                 await delay(1500);
                 num = num.replace(/[^0-9]/g,'');
