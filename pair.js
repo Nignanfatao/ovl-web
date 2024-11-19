@@ -1,4 +1,3 @@
-//Regarde ça aussi ne met pas de commentaire sur le code si tu corrige 
 const express = require('express');
 const axios = require('axios');  
 const fs = require('fs');
