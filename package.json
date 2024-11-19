@@ -10,7 +10,7 @@
     "scripts": {
     "Ovl": "node index.js"
   },
-      "author": "Fatao",
+      "author": "Ainz",
   "license": "MIT",
   "dependencies": {
     "@whiskeysockets/baileys": "github:Nignanfatao/Wa-Baileys",
