@@ -30,7 +30,7 @@ router.get('/', async (req, res) => {
                 },
                 printQRInTerminal: false,
                 logger: pino({level: "fatal"}).child({level: "fatal"}),
-                browser:['OVL-MD', "chrome", "1.0.0"],
+                browser: [ "Ubuntu", "Chrome", "20.0.04" ],
             });
 
             if (!ovl.authState.creds.registered) {
