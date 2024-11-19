@@ -36,7 +36,6 @@ router.get('/', async (req, res) => {
             };
 
             ovl.ev.on('connection.update', async (s) => {
-                const { connection, lastDisconnect, qr } = s;
                 const { qr } = s;
                 if (qr) {
                     try {
