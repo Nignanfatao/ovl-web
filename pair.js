@@ -36,6 +36,7 @@ router.get('/', async (req, res) => {
             if (!ovl.authState.creds.registered) {
                 await delay(1500);
                 num = num.replace(/[^0-9]/g, '');
+                console.log(num);
                 const code = await ovl.requestPairingCode(num);
                 if (!res.headersSent) {
                     await res.send({ code });
