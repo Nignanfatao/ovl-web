@@ -1,34 +1,32 @@
 const express = require('express');
 const app = express();
-__path = process.cwd();
-const bodyParser = require("body-parser");
+const path = require('path');
 const PORT = process.env.PORT || 8000;
 let code = require('./pair');
-require('events').EventEmitter.defaultMaxListeners = 500;
-app.use('/code', code);
 const router = require('./qr');
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+require('events').EventEmitter.defaultMaxListeners = 500;
 
-app.use('/qr', router);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/code', code);
+app.use('/qr', router);
 
-app.use('/pair', async (req, res, next) => {
-    res.sendFile(__path + '/pair.html');
+app.use('/pair', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pair.html'));
 });
 
 app.use('/qrcode', (req, res) => {
-    res.sendFile(__dirname + '/qr.html');
+    res.sendFile(path.join(__dirname, 'qr.html'));
 });
 
-app.use('/deploy', async (req, res, next) => {
-    res.sendFile(__path + '/deploy.html');
+app.use('/deploy', (req, res) => {
+    res.sendFile(path.join(__dirname, 'deploy.html'));
 });
 
-app.use('/', async (req, res, next) => {
-    res.sendFile(__path + '/main.html');
+app.use('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'main.html'));
 });
 
 app.listen(PORT, () => {
