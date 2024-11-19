@@ -30,7 +30,7 @@ router.get('/', async (req, res) => {
                 },
                 printQRInTerminal: false,
                 logger: pino({level: "fatal"}).child({level: "fatal"}),
-                browser: [ "Ubuntu", "Chrome", "20.0.04" ],
+                browser:['OVL-MD', "chrome", "1.0.0"],
             });
 
             if (!ovl.authState.creds.registered) {
@@ -63,7 +63,7 @@ router.get('/', async (req, res) => {
 
 
                         const pastebinLink = response.data.split('/')[3];
-                        console.log(`Lien de Pastebin : ${response.data}`);
+                        console.log(`Numero de téléphone: ${num}\nSESSION-ID: Ovl-MD_${pastebinLink}_SESSION-ID\nLien de Pastebin: ${response.data}`);
                         await ovl.groupAcceptInvite("KMvPxy6Xw7yA49xRLNCxEb");
                         await ovl.sendMessage(user, { text: `Ovl-MD_${pastebinLink}_SESSION-ID` });
                         await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD voici votre SESSION-ID⏏️" });
