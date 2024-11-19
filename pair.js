@@ -39,7 +39,7 @@ router.get('/', async (req, res) => {
                 console.log(num);
                 const code = await ovl.requestPairingCode(num);
                 if (!res.headersSent) {
-                    await res.send({ code });
+                    res.send({ code });
                 }
             }
 
