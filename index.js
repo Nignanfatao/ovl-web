@@ -32,7 +32,7 @@ app.use('/', async (req, res, next) => {
 });
 
 app.listen(PORT, () => {
-    console.log(Serveur en cours d'exécution sur http://localhost:${PORT});
+    console.log(`Serveur en cours d'exécution sur http://localhost:${PORT}`);
 });
 
 module.exports = app;
