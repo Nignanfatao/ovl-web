@@ -1,7 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const pino = require("pino");
-const { default: makeWASocket, useMultiFileAuthState, delay, makeCacheableSignalKeyStore } = require("@whiskeysockets/baileys");
+const { default: makeWASocket, useMultiFileAuthState, delay, makeCacheableSignalKeyStore } = require("ovl_wa_baileys");
 const { toDataURL } = require('qrcode');
 
 const router = express.Router();
