@@ -8,7 +8,7 @@ const {
     useMultiFileAuthState,
     delay,
     makeCacheableSignalKeyStore
-} = require("@whiskeysockets/baileys");
+} = require("ovl_wa_baileys");
 
 function removeFile(FilePath){
     if(!fs.existsSync(FilePath)) return false;
