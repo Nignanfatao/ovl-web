@@ -3,7 +3,7 @@ const fs = require('fs');
 const pino = require("pino");
 const { default: makeWASocket, useMultiFileAuthState, delay, makeCacheableSignalKeyStore } = require("ovl_wa_baileys");
 const { toDataURL } = require('qrcode');
-
+const axios = require('axios');
 const router = express.Router();
 
 function removeFile(FilePath) {
