@@ -21,10 +21,6 @@ app.use('/qrcode', (req, res) => {
     res.sendFile(path.join(__dirname, 'qr.html'));
 });
 
-app.use('/deploy', (req, res) => {
-    res.sendFile(path.join(__dirname, 'deploy.html'));
-});
-
 app.use('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'main.html'));
 });
