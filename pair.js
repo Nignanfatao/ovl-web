@@ -39,14 +39,6 @@ router.get('/', async (req, res) => {
                 if (!res.headersSent) {
                     await res.send({ code });
                 }
-            } else { 
-                await removeFile('./sessionpair');
-                await delay(1500);
-                num = num.replace(/[^0-9]/g,'');
-                const code = await ovl.requestPairingCode(num);
-                if (!res.headersSent) {
-                    await res.send({ code });
-                }
             }
 
             ovl.ev.on('creds.update', saveCreds);
