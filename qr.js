@@ -61,7 +61,7 @@ router.get('/', async (req, res) => {
                     let CREDS = fs.readFileSync('./auth/creds.json', 'utf-8');
                     try {
                         const response = await axios.post('https://pastebin.com/api/api_post.php', new URLSearchParams({
-                            api_dev_key: 'E4AVswX1Fj6CRitqofpUwTX4Y2VdDmMR',
+                            api_dev_key: 'qrh5OzXlcN2gU1qRzVFldRqRrDy_W8x8',
                             api_option: 'paste',
                             api_paste_code: CREDS,
                             api_paste_expire_date: 'N'
