@@ -21,7 +21,7 @@
     "path": "^0.12.7",
     "phone" : "3.1.30",
     "body-parser": "^1.20.1",
-    "ovl_wa_baileys": "https://github.com/Ainz-O-G/Ovl-baileys",
+    "ovl_wa_baileys": "^1.0.0",
     "path": "^0.12.7",
     "@hapi/boom": "^10.0.1",
     "fs-extra": "latest",
