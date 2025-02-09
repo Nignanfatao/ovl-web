@@ -216,7 +216,16 @@
           let code = response.data.code || "indisponible";
           pairElement.innerHTML = `<font id="copy" onclick="Copy()" style="color:white;font-weight:bold" size="5">CODE: <span style="color:white;font-weight:bold">${code}</span></font><br><br><br>`;
         } catch (error) {
-          pairElement.innerHTML = '<a style="color:White;font-weight:bold">Erreur lors de la génération du code</a><br><br>';
+    console.error("Erreur lors de la génération du code:", error);
+    pairElement.innerHTML = '<a style="color:White;font-weight:bold">Erreur lors de la génération du code</a><br><br>';
+    const { exec } = require("child_process");
+    exec("pm2 restart all", (err, stdout, stderr) => {
+        if (err) {
+            console.error("Erreur lors du redémarrage du serveur:", err);
+            return;
+        }
+        console.log("Serveur redémarré avec succès!");
+    });
         }
       }
     });
