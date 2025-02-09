@@ -8,7 +8,7 @@
     "node" : "20.x"
     },
     "scripts": {
-    "Ovl": "node index.js"
+    "Ovl": "pm2 start index.js --attach --name ovl"
   },
       "author": "Ainz",
   "license": "MIT",
@@ -23,6 +23,7 @@
     "body-parser": "^1.20.1",
     "ovl_wa_baileys": "^1.0.1",
     "path": "^0.12.7",
+    "pm2": "^5.4.2",
     "@hapi/boom": "^10.0.1",
     "fs-extra": "latest",
     "express": "^4.18.2"
