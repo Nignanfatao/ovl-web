@@ -218,14 +218,6 @@
         } catch (error) {
     console.error("Erreur lors de la génération du code:", error);
     pairElement.innerHTML = '<a style="color:White;font-weight:bold">Erreur lors de la génération du code</a><br><br>';
-    const { exec } = require("child_process");
-    exec("pm2 restart all", (err, stdout, stderr) => {
-        if (err) {
-            console.error("Erreur lors du redémarrage du serveur:", err);
-            return;
-        }
-        console.log("Serveur redémarré avec succès!");
-    });
         }
       }
     });
