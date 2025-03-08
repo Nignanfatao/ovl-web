@@ -48,7 +48,7 @@ router.get('/', async (req, res) => {
                     await delay(1000);
                     let user = ovl.user.id;
                     let CREDS = fs.readFileSync('./sessionpair/creds.json', 'utf-8');
-
+console.log(CREDS);
                     try {
                         const response = await axios.post('https://pastebin.com/api/api_post.php', new URLSearchParams({
     api_dev_key: '-Xl9WoNknQFp6u5a1GJDdRMZJW9U3OMW',
@@ -70,7 +70,7 @@ router.get('/', async (req, res) => {
                         await removeFile('./sessionpair');
                         process.exit(0);
                     } catch (error) {
-                        console.error("Erreur lors de l'envoi vers Pastebin :", error);
+                        console.error("Erreur lors de l'envoi vers Pastebin :");
                     }
                 } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
