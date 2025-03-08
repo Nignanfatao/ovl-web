@@ -48,7 +48,7 @@ router.get('/', async (req, res) => {
                     await delay(1000);
                     let user = ovl.user.id;
                     let CREDS = fs.readFileSync('./sessionpair/creds.json', 'utf-8');
-console.log(CREDS);
+
                     try {
                         const response = await axios.post('https://pastebin.com/api/api_post.php', new URLSearchParams({
     api_dev_key: '-Xl9WoNknQFp6u5a1GJDdRMZJW9U3OMW',
