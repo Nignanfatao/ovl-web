@@ -32,13 +32,12 @@ router.get('/', async (req, res) => {
                 browser: [ "Ubuntu", "Chrome", "20.0.04" ],
             });
 
+            
             if (!ovl.authState.creds.registered) {
-                await removeFile('./sessionpair');
                 await delay(1500);
                 num = num.replace(/[^0-9]/g,'');
                 const code = await ovl.requestPairingCode(num);
-                    await res.send({ code });
-                
+                return res.send({ code }); // ✅ Ajout du return pour éviter d'envoyer plusieurs réponses
             }
 
             ovl.ev.on('creds.update', saveCreds);
@@ -79,10 +78,10 @@ router.get('/', async (req, res) => {
                 }
             });
         } catch (err) {
-            console.log("Service redémarré");
+            console.log("Service redémarré", err);
             await removeFile('./sessionpair');
             if (!res.headersSent) {
-                await res.send({ code: "Service Unavailable" });
+                res.send({ code: "Service Unavailable" }); // ✅ Vérification avant d'envoyer la réponse
             }
         }
     }
