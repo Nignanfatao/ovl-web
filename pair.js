@@ -25,8 +25,6 @@ router.get('/', async (req, res) => {
     let num = req.query.number;
     
     async function ovlPair() {
-        await removeFile('./sessionpair');
-        await delay(1000);        
         const { state, saveCreds } = await useMultiFileAuthState('./sessionpair');
         
         try {
@@ -76,12 +74,12 @@ router.get('/', async (req, res) => {
                         
                         await delay(1000);  
                         await removeFile('./sessionpair');
-                        process.exit(0);
                     } catch (error) {
                         console.error("Erreur lors de l'envoi vers Pastebin :");
                     }
                 } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
+                    await removeFile('./sessionpair');
                     ovlPair();
                 }
             });
