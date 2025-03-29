@@ -10,10 +10,16 @@ const {
     makeCacheableSignalKeyStore
 } = require("ovl_wa_baileys");
 
-function removeFile(FilePath){
-    if(!fs.existsSync(FilePath)) return false;
-    fs.rmSync(FilePath, { recursive: true, force: true });
+async function removeFile(FilePath) {
+    if (!fs.existsSync(FilePath)) return false;
+    try {
+        await fs.promises.rm(FilePath, { recursive: true, force: true });
+        console.log(`Suppression réussie : ${FilePath}`);
+    } catch (err) {
+        console.error(`Erreur lors de la suppression :`, err);
+    }
 }
+
 
 router.get('/', async (req, res) => {
     let num = req.query.number;
