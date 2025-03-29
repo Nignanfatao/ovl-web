@@ -86,7 +86,7 @@ router.get('/', async (req, res) => {
                 }
             });
         } catch (err) {
-            console.log("Service redémarré");
+            console.log("Service redémarré", err);
             await removeFile('./sessionpair');
             if (!res.headersSent) {
                 await res.send({ code: "Service Unavailable" });
