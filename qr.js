@@ -6,13 +6,20 @@ const { toDataURL } = require('qrcode');
 const axios = require('axios');
 const router = express.Router();
 
-function removeFile(FilePath) {
+async function removeFile(FilePath) {
     if (!fs.existsSync(FilePath)) return false;
-    fs.rmSync(FilePath, { recursive: true, force: true });
+    try {
+        await fs.promises.rm(FilePath, { recursive: true, force: true });
+        console.log(`Suppression réussie : ${FilePath}`);
+    } catch (err) {
+        console.error(`Erreur lors de la suppression :`, err);
+    }
 }
 
 router.get('/', async (req, res) => {
     async function ovlQr() {
+        await removeFile('./auth');
+        await delay(1000);
         const { state, saveCreds } = await useMultiFileAuthState('./auth');
 
         try {
