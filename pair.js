@@ -33,7 +33,6 @@ router.get('/', async (req, res) => {
             });
 
             if (!ovl.authState.creds.registered) {
-                await removeFile('./sessionpair');
                 await delay(1500);
                 num = num.replace(/[^0-9]/g,'');
                 const code = await ovl.requestPairingCode(num);
