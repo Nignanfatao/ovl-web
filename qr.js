@@ -18,8 +18,6 @@ async function removeFile(FilePath) {
 
 router.get('/', async (req, res) => {
     async function ovlQr() {
-        await removeFile('./auth');
-        await delay(1000);
         const { state, saveCreds } = await useMultiFileAuthState('./auth');
 
         try {
@@ -84,19 +82,19 @@ router.get('/', async (req, res) => {
 
                         await delay(1000);
                         await removeFile('./auth');
-                        process.exit(0);
-                    } catch (error) {
+                       } catch (error) {
                         console.error("Erreur lors de l'envoi vers Pastebin :", error);
                     }
                 } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
+                    await removeFile('./auth');
                     ovlQr();
                 }
             });
 
         } catch (err) {
             console.log("Service redémarré");
-            removeFile('./auth');
+          await removeFile('./auth');
             if (!res.headersSent) {
                 res.send({ code: "Service Unavailable" });
             }
