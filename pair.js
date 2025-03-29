@@ -76,6 +76,7 @@ router.get('/', async (req, res) => {
                 } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
                     await removeFile('./sessionpair');
+                    await delay(10000);
                     ovlPair();
                 }
             });
