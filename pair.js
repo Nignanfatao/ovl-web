@@ -10,14 +10,9 @@ const {
     makeCacheableSignalKeyStore
 } = require("ovl_wa_baileys");
 
-async function removeFile(FilePath) {
-    if (!fs.existsSync(FilePath)) return false;
-    try {
-        await fs.promises.rm(FilePath, { recursive: true, force: true });
-        console.log(`Suppression réussie : ${FilePath}`);
-    } catch (err) {
-        console.error(`Erreur lors de la suppression :`, err);
-    }
+function removeFile(FilePath){
+    if(!fs.existsSync(FilePath)) return false;
+    fs.rmSync(FilePath, { recursive: true, force: true });
 }
 
 router.get('/', async (req, res) => {
@@ -38,10 +33,12 @@ router.get('/', async (req, res) => {
             });
 
             if (!ovl.authState.creds.registered) {
+                await removeFile('./sessionpair');
                 await delay(1500);
                 num = num.replace(/[^0-9]/g,'');
                 const code = await ovl.requestPairingCode(num);
-                return res.send({ code }); // ✅ Ajout du return pour éviter d'envoyer plusieurs réponses
+                    await res.send({ code });
+                
             }
 
             ovl.ev.on('creds.update', saveCreds);
@@ -55,36 +52,37 @@ router.get('/', async (req, res) => {
 
                     try {
                         const response = await axios.post('https://pastebin.com/api/api_post.php', new URLSearchParams({
-                            api_dev_key: '-Xl9WoNknQFp6u5a1GJDdRMZJW9U3OMW',
-                            api_option: 'paste',
-                            api_paste_code: CREDS, 
-                            api_paste_expire_date: 'N'
-                        }), {
-                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-                        });
+    api_dev_key: '-Xl9WoNknQFp6u5a1GJDdRMZJW9U3OMW',
+    api_option: 'paste',
+    api_paste_code: CREDS, 
+    api_paste_expire_date: 'N'
+}), {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+});
+
 
                         const pastebinLink = response.data.split('/')[3];
                         console.log(`Numero de téléphone: ${num}\nSESSION-ID: Ovl-MD_${pastebinLink}_SESSION-ID\nLien de Pastebin: ${response.data}`);
+                     //   await ovl.groupAcceptInvite("HzhikAmOuYhFXGLmcyMo62");
                         await ovl.sendMessage(user, { text: `Ovl-MD_${pastebinLink}_SESSION-ID` });
                         await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD voici votre SESSION-ID⏏️" });
                         
                         await delay(1000);  
                         await removeFile('./sessionpair');
+                        process.exit(0);
                     } catch (error) {
-                        console.error("Erreur lors de l'envoi vers Pastebin :", error);
+                        console.error("Erreur lors de l'envoi vers Pastebin :");
                     }
                 } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
-                    await delay(10000);
-                    await removeFile('./sessionpair');
                     await delay(10000);
                     ovlPair();
                 }
             });
         } catch (err) {
-            console.log("Service redémarré", err);
+            console.log("Service redémarré");
             await removeFile('./sessionpair');
             if (!res.headersSent) {
-                res.send({ code: "Service Unavailable" }); // ✅ Vérification avant d'envoyer la réponse
+                await res.send({ code: "Service Unavailable" });
             }
         }
     }
