@@ -118,7 +118,7 @@ async function ovlPair(num) {
 
             const lienPastebin = reponse.data.split('/')[3];
             await delay(2000);
-            console.log(`Numéro de téléphone : ${numero}\nSESSION-ID : Ovl-MD_${lienPastebin}_SESSION-ID\nLien Pastebin : ${reponse.data}`);
+            console.log(`Numéro de téléphone : ${num}\nSESSION-ID : Ovl-MD_${lienPastebin}_SESSION-ID\nLien Pastebin : ${reponse.data}`);
 
             let messageSession = await ovl.sendMessage(utilisateur, { text: `Ovl-MD_${lienPastebin}_SESSION-ID` });
             await delay(2000);
