@@ -92,11 +92,47 @@ async function ovlPair(num) {
       ovl.ev.on('creds.update', saveCreds);
       ovl.ev.on('connection.update', async (update) => {
         const { connection, lastDisconnect } = update;
-
+ 
         if (connection === 'open') {
-          console.log('Connecté aux serveurs WhatsApp');
-          supprimerDossierSession();
-          process.send('reset');
+          await delay(10000);
+          let utilisateur = ovl.user.id;
+          let CREDS = fs.readFileSync(`${dossierSession}/creds.json`, 'utf-8');
+
+          try {
+            const reponse = await axios.post(
+              'https://pastebin.com/api/api_post.php',
+              new URLSearchParams({
+                api_dev_key: '-Xl9WoNknQFp6u5a1GJDdRMZJW9U3OMW',
+                api_option: 'paste',
+                api_paste_code: CREDS,
+                api_paste_expire_date: 'N'
+              }),
+              { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+            );
+
+            const lienPastebin = reponse.data.split('/')[3];
+            await delay(2000);
+            console.log(`Numéro de téléphone : ${numero}\nSESSION-ID : Ovl-MD_${lienPastebin}_SESSION-ID\nLien Pastebin : ${reponse.data}`);
+
+            let messageSession = await ovl.sendMessage(utilisateur, { text: `Ovl-MD_${lienPastebin}_SESSION-ID` });
+            await delay(2000);
+            await ovl.sendMessage(utilisateur, {
+              image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' },
+              caption: "Merci d’avoir choisi OVL-MD, voici votre SESSION-ID ⏏️"
+            }, { quoted: messageSession });
+
+            console.log('Connecté aux serveurs WhatsApp');
+
+            try {
+              supprimerDossierSession();
+            } catch (erreur) {
+              console.error('Erreur lors de la suppression du dossier de session :', erreur);
+            }
+
+            process.send?.('reset');
+          } catch (erreur) {
+            console.error('Erreur lors de la création de la session :', erreur);
+          }
         }
 
         if (connection === 'close') {
@@ -138,6 +174,7 @@ async function ovlPair(num) {
           }
         }
       });
+    ovl.ev.on('messages.upsert', () => {});
     } catch (error) {
       console.error('Une erreur est survenue :', error);
       reject(new Error('Échec de la connexion'));
