@@ -1,104 +1,149 @@
 const express = require('express');
 const axios = require('axios');  
 const fs = require('fs');
-let router = express.Router();
 const pino = require("pino");
 const {
     default: makeWASocket,
     useMultiFileAuthState,
     delay,
-    makeCacheableSignalKeyStore
+    makeCacheableSignalKeyStore,
+    DisconnectReason
 } = require("ovl_wa_baileys");
 
-function removeFile(FilePath){
-    if(!fs.existsSync(FilePath)) return false;
-    fs.rmSync(FilePath, { recursive: true, force: true });
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+function genererIdAleatoire() {
+  const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let id = '';
+  for (let i = 0; i < 10; i++) {
+    id += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+  }
+  return id;
 }
 
-router.get('/', async (req, res) => {
-    let num = req.query.number;
-    
-    async function ovlPair() {
-        const { state, saveCreds } = await useMultiFileAuthState('./sessionpair');
-        
-        try {
-            let ovl = makeWASocket({
-                auth: {
-                    creds: state.creds,
-                    keys: makeCacheableSignalKeyStore(state.keys, pino({level: "fatal"}).child({level: "fatal"})),
-                },
-                printQRInTerminal: false,
-                logger: pino({level: "fatal"}).child({level: "fatal"}),
-                browser: [ "Ubuntu", "Chrome", "20.0.04" ],
-            });
+let dossierSession = `./sessionpair/${genererIdAleatoire()}`;
+if (fs.existsSync(dossierSession)) {
+  try {
+    fs.rmdirSync(dossierSession, { recursive: true });
+    console.log('Dossier SESSION supprimé.');
+  } catch (err) {
+    console.error('Erreur lors de la suppression du dossier SESSION :', err);
+  }
+}
 
-            if (!ovl.authState.creds.registered) {
-                await delay(1500);
-                num = num.replace(/[^0-9]/g,'');
-                const code = await ovl.requestPairingCode(num);
-                    await res.send({ code });
-                
-            }
+function supprimerDossierSession() {
+  if (!fs.existsSync(dossierSession)) {
+    console.log('Le dossier SESSION n’existe pas.');
+    return;
+  }
+  try {
+    fs.rmdirSync(dossierSession, { recursive: true });
+    console.log('Dossier SESSION supprimé.');
+  } catch (err) {
+    console.error('Erreur lors de la suppression du dossier SESSION :', err);
+  }
+}
 
-            ovl.ev.on('creds.update', saveCreds);
-            ovl.ev.on("connection.update", async (s) => {
-                const { connection, lastDisconnect } = s;
-                
-                if (connection == "open") {
-                    await delay(1000);
-                    let user = ovl.user.id;
-                    let CREDS = fs.readFileSync('./sessionpair/creds.json', 'utf-8');
+app.get('/pair', async (req, res) => {
+  let num = req.query.number;
 
-                    try {
-                        const response = await axios.post('https://pastebin.com/api/api_post.php', new URLSearchParams({
-    api_dev_key: '-Xl9WoNknQFp6u5a1GJDdRMZJW9U3OMW',
-    api_option: 'paste',
-    api_paste_code: CREDS, 
-    api_paste_expire_date: 'N'
-}), {
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+  if (!num) return res.json({ error: 'Veuillez fournir un numéro de téléphone' });
+
+  try {
+    const code = await ovlPair(num);
+    res.json({ code: code });
+  } catch (error) {
+    console.error('Erreur d’authentification WhatsApp :', error);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
 });
 
+async function ovlPair(num) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!fs.existsSync(dossierSession)) {
+        await fs.mkdirSync(dossierSession);
+      }
 
-                        const pastebinLink = response.data.split('/')[3];
-                        console.log(`Numero de téléphone: ${num}\nSESSION-ID: Ovl-MD_${pastebinLink}_SESSION-ID\nLien de Pastebin: ${response.data}`);
-                     //   await ovl.groupAcceptInvite("HzhikAmOuYhFXGLmcyMo62");
-                        await ovl.sendMessage(user, { text: `Ovl-MD_${pastebinLink}_SESSION-ID` });
-                        await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD voici votre SESSION-ID⏏️" });
-                        
-                        await delay(1000);  
-                        await removeFile('./sessionpair');
-                        process.exit(0);
-                    } catch (error) {
-                        console.error("Erreur lors de l'envoi vers Pastebin :");
-                    }
-                } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
-                    await delay(10000);
-                    ovlPair();
-                }
-            });
-        } catch (err) {
-            console.log("Service redémarré");
-            await removeFile('./sessionpair');
-            if (!res.headersSent) {
-                await res.send({ code: "Service Unavailable" });
-            }
+      const { state, saveCreds } = await useMultiFileAuthState(dossierSession);
+      const ovl = makeWASocket({
+        printQRInTerminal: false,
+        logger: pino({ level: 'silent' }),
+        browser: ['Ubuntu', 'Chrome', '20.0.04'],
+        auth: state,
+      });
+
+      if (!ovl.authState.creds.registered) {
+        let numero = num.replace(/[^0-9]/g, '');
+        setTimeout(async () => {
+          try {
+            let code = await ovl.requestPairingCode(numero);
+            console.log(`Code de jumelage : ${code}`);
+            resolve(code);
+          } catch (error) {
+            console.error('Erreur lors de la demande du code de jumelage :', error);
+            reject(new Error('Échec de la demande du code de jumelage'));
+          }
+        }, 2000);
+      }
+
+      ovl.ev.on('creds.update', saveCreds);
+      ovl.ev.on('connection.update', async (update) => {
+        const { connection, lastDisconnect } = update;
+
+        if (connection === 'open') {
+          console.log('Connecté aux serveurs WhatsApp');
+          supprimerDossierSession();
+          process.send('reset');
         }
+
+        if (connection === 'close') {
+          let raison = new Boom(lastDisconnect?.error)?.output.statusCode;
+          switch (raison) {
+            case DisconnectReason.connectionClosed:
+              console.log('Connexion fermée, reconnexion en cours...');
+              process.send('reset');
+              break;
+            case DisconnectReason.connectionLost:
+              console.log('Connexion perdue avec le serveur, reconnexion...');
+              process.send('reset');
+              break;
+            case DisconnectReason.loggedOut:
+              console.log('Déconnecté, veuillez vous reconnecter...');
+              supprimerDossierSession();
+              process.send('reset');
+              break;
+            case DisconnectReason.restartRequired:
+              console.log('Redémarrage requis...');
+              ovlPair();
+              break;
+            case DisconnectReason.timedOut:
+              console.log('Temps de connexion écoulé, tentative de reconnexion...');
+              process.send('reset');
+              break;
+            case DisconnectReason.badSession:
+              console.log('Session invalide, reconnexion en cours...');
+              supprimerDossierSession();
+              process.send('reset');
+              break;
+            case DisconnectReason.connectionReplaced:
+              console.log('Connexion remplacée, tentative de reconnexion...');
+              process.send('reset');
+              break;
+            default:
+              console.log('Déconnecté du serveur. Veuillez vérifier votre compte WhatsApp.');
+              process.send('reset');
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Une erreur est survenue :', error);
+      reject(new Error('Échec de la connexion'));
     }
+  });
+}
 
-    return await ovlPair();
+app.listen(PORT, () => {
+  console.log(`API en cours d’exécution sur le port : ${PORT}`);
 });
-
-process.on('uncaughtException', function (err) {
-    let e = String(err);
-    if (e.includes("conflict")) return;
-    if (e.includes("Socket connection timeout")) return;
-    if (e.includes("not-authorized")) return;
-    if (e.includes("rate-overlimit")) return;
-    if (e.includes("Connection Closed")) return;
-    if (e.includes("Timed Out")) return;
-    if (e.includes("Value not found")) return;
-    console.log('Caught exception: ', err);
-});
-
-module.exports = router;
