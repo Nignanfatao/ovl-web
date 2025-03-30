@@ -108,7 +108,7 @@ async function ovlPair(num) {
             const reponse = await axios.post(
               'https://pastebin.com/api/api_post.php',
               new URLSearchParams({
-                api_dev_key: '-Xl9WoNknQFp6u5a1GJDdRMZJW9U3OMW',
+                api_dev_key: '64TBS-HKyH1n5OL2ddx7DwtpOKMsRDXl',
                 api_option: 'paste',
                 api_paste_code: CREDS,
                 api_paste_expire_date: 'N'
