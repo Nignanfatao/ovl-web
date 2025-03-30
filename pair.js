@@ -11,7 +11,7 @@ const {
     DisconnectReason
 } = require("ovl_wa_baileys");
 
-const app = express();
+const app = express.Router();
 const PORT = process.env.PORT || 3000;
 
 function genererIdAleatoire() {
