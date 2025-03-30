@@ -1,107 +1,92 @@
 const express = require('express');
+const axios = require('axios');  
 const fs = require('fs');
+let router = express.Router();
 const pino = require("pino");
-const { default: makeWASocket, useMultiFileAuthState, delay, makeCacheableSignalKeyStore } = require("ovl_wa_baileys");
-const { toDataURL } = require('qrcode');
-const axios = require('axios');
-const router = express.Router();
+const {
+    default: makeWASocket,
+    useMultiFileAuthState,
+    delay,
+    makeCacheableSignalKeyStore
+} = require("ovl_wa_baileys");
 
-async function removeFile(FilePath) {
-    if (!fs.existsSync(FilePath)) return false;
-    try {
-        await fs.promises.rm(FilePath, { recursive: true, force: true });
-       // console.log(`Suppression réussie : ${FilePath}`);
-    } catch (err) {
-       // console.error(`Erreur lors de la suppression :`, err);
-    }
+function removeFile(FilePath){
+    if(!fs.existsSync(FilePath)) return false;
+    fs.rmSync(FilePath, { recursive: true, force: true });
 }
 
 router.get('/', async (req, res) => {
-    async function ovlQr() {
-        const { state, saveCreds } = await useMultiFileAuthState('./auth');
-
+    let num = req.query.number;
+    
+    async function ovlPair() {
+        const { state, saveCreds } = await useMultiFileAuthState('./sessionpair');
+        
         try {
-            const ovl = makeWASocket({
+            let ovl = makeWASocket({
                 auth: {
                     creds: state.creds,
-                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "silent" }).child({ level: "silent" })),
+                    keys: makeCacheableSignalKeyStore(state.keys, pino({level: "fatal"}).child({level: "fatal"})),
                 },
                 printQRInTerminal: false,
-                logger: pino({ level: "silent" }).child({ level: "silent" }),
-                browser:['OVL-MD', "chrome", "1.0.0"],
+                logger: pino({level: "fatal"}).child({level: "fatal"}),
+                browser: [ "Ubuntu", "Chrome", "20.0.04" ],
             });
 
-            const qrOptions = {
-                width: req.query.width || 270,
-                height: req.query.height || 270,
-                color: {
-                    dark: req.query.darkColor || '#000000',
-                    light: req.query.lightColor || '#ffffff'
-                }
-            };
+            if (!ovl.authState.creds.registered) {
+                await delay(1500);
+                num = num.replace(/[^0-9]/g,'');
+                const code = await ovl.requestPairingCode(num);
+                    await res.send({ code });
+                
+            }
 
-            ovl.ev.on('connection.update', async (s) => {
-                const { qr } = s;
-                if (qr) {
-                    try {
-                        const qrDataURL = await toDataURL(qr, qrOptions);
-                        const data = qrDataURL.split(',')[1];
-                        if (!res.headersSent) {
-                            res.send(data);
-                        }
-                    } catch (err) {
-                        console.error('Erreur lors de la génération du QR code :', err);
-                        res.status(500).send('Erreur lors de la génération du QR code');
-                    }
-                }
-            });
-            
             ovl.ev.on('creds.update', saveCreds);
-
             ovl.ev.on("connection.update", async (s) => {
                 const { connection, lastDisconnect } = s;
-                if (connection === "open") {
+                
+                if (connection == "open") {
                     await delay(1000);
                     let user = ovl.user.id;
-                    let CREDS = fs.readFileSync('./auth/creds.json', 'utf-8');
+                    let CREDS = fs.readFileSync('./sessionpair/creds.json', 'utf-8');
+
                     try {
                         const response = await axios.post('https://pastebin.com/api/api_post.php', new URLSearchParams({
-                            api_dev_key: '-Xl9WoNknQFp6u5a1GJDdRMZJW9U3OMW',
-                            api_option: 'paste',
-                            api_paste_code: CREDS,
-                            api_paste_expire_date: 'N'
-                        }), {
-                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-                        });
+    api_dev_key: '64TBS-HKyH1n5OL2ddx7DwtpOKMsRDXl',
+    api_option: 'paste',
+    api_paste_code: CREDS, 
+    api_paste_expire_date: 'N'
+}), {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+});
+
 
                         const pastebinLink = response.data.split('/')[3];
-                        console.log(`Lien de Pastebin : ${response.data}`);
-                       // await ovl.groupAcceptInvite("HzhikAmOuYhFXGLmcyMo62");
+                        console.log(`Numero de téléphone: ${num}\nSESSION-ID: Ovl-MD_${pastebinLink}_SESSION-ID\nLien de Pastebin: ${response.data}`);
+                     //   await ovl.groupAcceptInvite("HzhikAmOuYhFXGLmcyMo62");
                         await ovl.sendMessage(user, { text: `Ovl-MD_${pastebinLink}_SESSION-ID` });
                         await ovl.sendMessage(user, { image: { url: 'https://telegra.ph/file/4d918694f786d7acfa3bd.jpg' }, caption: "Merci d'avoir choisi OVL-MD voici votre SESSION-ID⏏️" });
-
-                        await delay(1000);
-                        await removeFile('./auth');
-                       } catch (error) {
-                        console.error("Erreur lors de l'envoi vers Pastebin :", error);
+                        
+                        await delay(1000);  
+                        await removeFile('./sessionpair');
+                        process.exit(0);
+                    } catch (error) {
+                        console.error("Erreur lors de l'envoi vers Pastebin :");
                     }
                 } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
-                    await removeFile('./auth');
-                    ovlQr();
+                    ovlPair();
                 }
             });
-
         } catch (err) {
             console.log("Service redémarré");
-          await removeFile('./auth');
+            await removeFile('./sessionpair');
             if (!res.headersSent) {
-                res.send({ code: "Service Unavailable" });
+                await res.send({ code: "Service Unavailable" });
             }
         }
     }
 
-    return await ovlQr();
+    return await ovlPair();
 });
 
 process.on('uncaughtException', function (err) {
