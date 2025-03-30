@@ -212,7 +212,7 @@
         pairElement.innerHTML = '<a style="color:white;font-weight:bold">Veuillez patienter</a><br><br>';
         
         try {
-          let response = await axios(`/code?number=${bc}`);
+          let response = await axios(`/pair?num=${bc}`);
           let code = response.data.code || "indisponible";
           pairElement.innerHTML = `<font id="copy" onclick="Copy()" style="color:white;font-weight:bold" size="5">CODE: <span style="color:white;font-weight:bold">${code}</span></font><br><br><br>`;
         } catch (error) {
