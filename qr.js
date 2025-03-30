@@ -10,9 +10,9 @@ async function removeFile(FilePath) {
     if (!fs.existsSync(FilePath)) return false;
     try {
         await fs.promises.rm(FilePath, { recursive: true, force: true });
-        console.log(`Suppression réussie : ${FilePath}`);
+       // console.log(`Suppression réussie : ${FilePath}`);
     } catch (err) {
-        console.error(`Erreur lors de la suppression :`, err);
+       // console.error(`Erreur lors de la suppression :`, err);
     }
 }
 
