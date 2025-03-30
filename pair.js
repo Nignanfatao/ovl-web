@@ -2,6 +2,7 @@ const express = require('express');
 const axios = require('axios');  
 const fs = require('fs');
 const pino = require("pino");
+const { Boom } = require('@hapi/boom');
 const {
     default: makeWASocket,
     useMultiFileAuthState,
