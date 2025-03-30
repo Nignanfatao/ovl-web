@@ -144,7 +144,3 @@ async function ovlPair(num) {
     }
   });
 }
-
-app.listen(PORT, () => {
-  console.log(`API en cours d’exécution sur le port : ${PORT}`);
-});
