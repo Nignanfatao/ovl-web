@@ -32,6 +32,12 @@ if (fs.existsSync(dossierSession)) {
     console.error('Erreur lors de la suppression du dossier SESSION :', err);
   }
 }
+try {
+  fs.mkdirSync(dossierSession, { recursive: true });
+  console.log('Dossier SESSION recréé avec le même ID.');
+} catch (err) {
+  console.error('Erreur lors de la création du dossier SESSION :', err);
+}
 
 function supprimerDossierSession() {
   if (!fs.existsSync(dossierSession)) {
