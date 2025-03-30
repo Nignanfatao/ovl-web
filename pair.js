@@ -53,7 +53,7 @@ app.get('/pair', async (req, res) => {
 
   try {
     const code = await ovlPair(num);
-    res.json({ code: code });
+    res.send({ code: code });
   } catch (error) {
     console.error('Erreur d’authentification WhatsApp :', error);
     res.status(500).json({ error: 'Erreur interne du serveur' });
