@@ -46,7 +46,7 @@ function supprimerDossierSession() {
   }
 }
 
-app.get('/pair', async (req, res) => {
+app.get('/', async (req, res) => {
   let num = req.query.number;
 
   if (!num) return res.json({ error: 'Veuillez fournir un numéro de téléphone' });
